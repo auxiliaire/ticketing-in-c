@@ -1,0 +1,50 @@
+# Program we are building
+TARGET_EXEC ?= ticketing
+
+BUILD_DIR := build
+SRC_DIRS := src lib
+
+SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c' -or -name '*.s')
+
+OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
+
+DEPS := $(OBJS:.o=.d)
+
+INC_DIRS := $(shell find $(SRC_DIRS) -type d)
+INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+
+# Build options
+CPPFLAGS := $(INC_FLAGS) -MMD -MP
+
+CFLAGS = -W -Wall -Wextra -g
+# Mongoose build options. See https://mongoose.ws/documentation/#build-options
+CFLAGS += -DMG_HTTP_DIRLIST_TIME_FMT="%Y/%m/%d %H:%M:%S"
+CFLAGS += -DMG_ENABLE_LINES=1 -DMG_ENABLE_IPV6=1 -DMG_ENABLE_SSI=1
+
+# Extra libraries etc
+CFLAGS += `pkg-config --cflags glib-2.0`
+CFLAGS += `pkg-config --cflags json-c`
+CFLAGS += `pkg-config --cflags libmustach-json-c`
+
+# Libraries
+LIBS = `pkg-config --libs sqlite3`
+LIBS += `pkg-config --libs glib-2.0`
+LIBS += `pkg-config --libs json-c`
+LIBS += `pkg-config --libs libmustach-json-c`
+
+$(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
+	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
+
+$(BUILD_DIR)/%.c.o: %.c
+	mkdir -p $(dir $@)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@ $(LIBS)
+
+$(BUILD_DIR)/%.cpp.o: %.cpp
+	mkdir -p $(dir $@)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ $(LIBS)
+
+.PHONY: clean
+clean:                    # Cleanup. Delete built program and all build artifacts
+	rm -r $(BUILD_DIR)
+
+-include $(DEPS)
