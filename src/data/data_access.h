@@ -9,5 +9,6 @@
 #include <stdlib.h>
 
 void set_value(void *object, size_t index, void *value);
+// TODO: define as_json.
 
 #endif

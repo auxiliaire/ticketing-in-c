@@ -7,6 +7,7 @@
 
 #define LAYOUT_VIEW "view/layout.html"
 
+// TODO: define default_route_try.
 void default_route(struct mg_connection *c, void *ev_data);
 
 #endif
