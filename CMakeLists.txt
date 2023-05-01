@@ -24,8 +24,18 @@ link_directories(
     ${LIBMUSTACH_JSONC_LIBRARY_DIRS}
 )
 
-file(GLOB_RECURSE SRC_FILES src/*.c)
 file(GLOB_RECURSE LIB_FILES lib/*.c)
+add_library(tickets-controller MODULE ${CMAKE_CURRENT_SOURCE_DIR}/src/site/controller/tickets_controller.c ${LIB_FILES})
+add_library(default-controller MODULE ${CMAKE_CURRENT_SOURCE_DIR}/src/site/controller/default_controller.c ${LIB_FILES})
+
+file(GLOB SRC_FILES
+    src/*.c
+    src/api/*.c
+    src/data/*.c
+    src/data/ticket/*.c
+    src/site/*.c
+    src/site/default/*.c
+)
 add_executable(
     ticketing
     ${SRC_FILES}
@@ -47,6 +57,32 @@ target_include_directories(ticketing PUBLIC
 )
 target_link_libraries(
     ticketing
+    ${SQLite3_LIBRARIES}
+    ${GLIB_LINK_LIBRARIES}
+    ${JSONC_LINK_LIBRARIES}
+    ${LIBMUSTACH_JSONC_LINK_LIBRARIES}
+)
+
+target_include_directories(tickets-controller PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/data
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/data/ticket
+)
+target_link_libraries(
+    tickets-controller
+    ${SQLite3_LIBRARIES}
+    ${GLIB_LINK_LIBRARIES}
+    ${JSONC_LINK_LIBRARIES}
+    ${LIBMUSTACH_JSONC_LINK_LIBRARIES}
+)
+
+target_include_directories(default-controller PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/data
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/data/ticket
+)
+target_link_libraries(
+    default-controller
     ${SQLite3_LIBRARIES}
     ${GLIB_LINK_LIBRARIES}
     ${JSONC_LINK_LIBRARIES}

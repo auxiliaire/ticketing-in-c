@@ -15,6 +15,8 @@
 
 #define TICKETS_ROUTE "/tickets/*"
 
+#define LAYOUT_VIEW "view/layout.html"
+
 /* SERVER */
 static int s_debug_level = MG_LL_INFO;
 static const char *s_root_dir = ".";
@@ -36,32 +38,26 @@ static void signal_handler(int signo) {
 static void http_dispatcher(struct mg_connection *c, int ev, void *ev_data, void *ctx) {
     if (ev == MG_EV_HTTP_MSG) {
         struct mg_http_message *hm = ev_data, tmp = {0};
-        struct mg_str parts[3];
 
         // TODO: refactor this if to a loop
         if (api_route_try(c, ev_data, ctx)) {
             /* API */
             return;
 
-        } else if (mg_match(hm->uri, mg_str("/*/*"), parts)) {
-            /* CONTROLLER/ACTION ROUTE */
-            // TODO: factor out to route.
-            GString *controller = g_string_new_len(parts[0].ptr, parts[0].len);
-            GString *action = g_string_new_len(parts[1].ptr, parts[1].len);
-            MG_INFO(("\tController: %s, Action: %s", controller->len > 0 ? controller->str : "default", action->len > 0 ? action->str : "index"));
-            mg_http_reply(c, 200, "Content-Type: text/plain\r\n", "OK");
-
-        } else if (mg_match(hm->uri, mg_str(DEFAULT_ROUTE), NULL)) {
+        } else if (default_route_try(c, ev_data, ctx)) {
             /* DEFAULT ROUTE */
-            default_route(c, ev_data);
+            return;
 
         } else {
             /* SERVE FILES */
             // TODO: factor out to route.
             struct mg_str unknown = mg_str_n("?", 1), *cl;
-            struct mg_http_serve_opts opts = {0};
-            opts.root_dir = s_root_dir;
-            opts.ssi_pattern = s_ssi_pattern;
+            struct mg_http_serve_opts opts = {
+                .root_dir = s_root_dir,
+                .ssi_pattern = s_ssi_pattern,
+                .mime_types = "htm=text/html,html=text/html",
+                .page404 = "./view/404.html"
+            };
             mg_http_serve_dir(c, hm, &opts);
             mg_http_parse((char *) c->send.buf, c->send.len, &tmp);
             cl = mg_http_get_header(&tmp, "Content-Length");
@@ -128,6 +124,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
     _ctx.db = _db;
+    _ctx.layout = g_string_new(LAYOUT_VIEW);
     // Initialize webserver
     mg_log_set(s_debug_level);
     mg_mgr_init(&mgr);
