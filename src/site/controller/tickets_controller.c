@@ -10,9 +10,9 @@ void get_index_action(struct mg_connection* c, void* ev_data, application_contex
 
     GList *param;
     for (param = ctx->url_matches; param != NULL; param = param->next) {
-        MG_INFO(("param: %s", param->data));
+        MG_INFO(("\t\tparam: %s", param->data));
     }
-    g_list_free(ctx->url_matches);
+    g_list_free(param);
     ctx->url_matches = NULL;
 
     size_t template_size = 0;

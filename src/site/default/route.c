@@ -36,12 +36,12 @@ bool default_route_try(struct mg_connection* c, void* ev_data, application_conte
             GError *error = NULL;
             GRegex *regex = g_regex_new("\\d+", 0, 0, &error);
             if (error != NULL) {
-                MG_INFO(("Regex error: '%s'", error->message));
+                MG_ERROR(("Regex error: '%s'", error->message));
                 g_error_free(error);
             } else {
-                MG_INFO(("Checking part1 '%s'", part1->str));
+                MG_DEBUG(("Checking part1 '%s'", part1->str));
                 gboolean m = g_regex_match_full(regex, part1->str, part1->len, 0, 0, &match_info, &error);
-                MG_INFO((m ? "matching" : "not matching"));
+                MG_DEBUG((m ? "matching" : "not matching"));
                 while (g_match_info_matches(match_info)) {
                     gchar *word = g_match_info_fetch(match_info, 0);
                     MG_INFO(("\t\tmatch: %s", word));
@@ -54,12 +54,12 @@ bool default_route_try(struct mg_connection* c, void* ev_data, application_conte
                 g_match_info_free(match_info);
                 g_regex_unref(regex);
                 if (error != NULL) {
-                    MG_INFO(("Regex error: '%s'", error->message));
+                    MG_ERROR(("Regex error: '%s'", error->message));
                     g_error_free(error);
                 }
             }
             if (!action) {
-                MG_INFO(("No action found yet"));
+                MG_DEBUG(("Action falling back to '%s'", part1->str));
                 action = g_string_new_len(part1->str, part1->len);
             }
             g_string_free(part1, FALSE);
