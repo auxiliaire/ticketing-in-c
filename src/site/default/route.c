@@ -5,6 +5,7 @@
 #include "mustach/mustach.h"
 #include "mustach/mustach-json-c.h"
 #include <dlfcn.h>
+#include <ctype.h>
 
 
 void log_key(gpointer key, gpointer value, gpointer user_data);
@@ -21,16 +22,55 @@ bool default_route_try(struct mg_connection* c, void* ev_data, application_conte
     GString *method = g_string_new_len(hm->method.ptr, hm->method.len);
     method = g_string_ascii_down(method);
     GString *controller;
-    GString *action;
+    GString *action = NULL;
+    GList *matches = NULL;
     if (mg_match(hm->uri, mg_str(CONTROLLER_ACTION_ROUTE), parts)) {
 
         controller = parts[0].len > 0
                               ? g_string_new_len(parts[0].ptr, parts[0].len)
                               : g_string_new("default");
-        action = parts[1].len > 0
+
+        if (parts[1].len > 0) {
+            GString *part1 = g_string_new_len(parts[1].ptr, parts[1].len);
+            GMatchInfo *match_info;
+            GError *error = NULL;
+            GRegex *regex = g_regex_new("\\d+", 0, 0, &error);
+            if (error != NULL) {
+                MG_INFO(("Regex error: '%s'", error->message));
+                g_error_free(error);
+            } else {
+                MG_INFO(("Checking part1 '%s'", part1->str));
+                gboolean m = g_regex_match_full(regex, part1->str, part1->len, 0, 0, &match_info, &error);
+                MG_INFO((m ? "matching" : "not matching"));
+                while (g_match_info_matches(match_info)) {
+                    gchar *word = g_match_info_fetch(match_info, 0);
+                    MG_INFO(("\t\tmatch: %s", word));
+                    matches = g_list_append(matches, word);
+                    // g_free(word);
+                    action = g_string_new("index");
+                    g_match_info_next(match_info, &error);
+                }
+                ctx->url_matches = matches;
+                g_match_info_free(match_info);
+                g_regex_unref(regex);
+                if (error != NULL) {
+                    MG_INFO(("Regex error: '%s'", error->message));
+                    g_error_free(error);
+                }
+            }
+            if (!action) {
+                MG_INFO(("No action found yet"));
+                action = g_string_new_len(part1->str, part1->len);
+            }
+            g_string_free(part1, FALSE);
+        } else {
+            action = g_string_new("index");
+        }
+        /*
+                    action = parts[1].len > 0
                           ? g_string_new_len(parts[1].ptr, parts[1].len)
                           : g_string_new("index");
-
+        */
         MG_INFO(("\t\t(%s) / (%s)", controller->str, action->str));
 
     } else if (mg_match(hm->uri, mg_str(DEFAULT_ROUTE), NULL)) {

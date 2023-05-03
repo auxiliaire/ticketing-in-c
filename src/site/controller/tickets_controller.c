@@ -8,6 +8,13 @@ void get_index_action(struct mg_connection* c, void* ev_data, application_contex
 
     struct mg_http_message *hm = ev_data;
 
+    GList *param;
+    for (param = ctx->url_matches; param != NULL; param = param->next) {
+        MG_INFO(("param: %s", param->data));
+    }
+    g_list_free(ctx->url_matches);
+    ctx->url_matches = NULL;
+
     size_t template_size = 0;
     char *template = mg_file_read(&mg_fs_posix, ctx->layout->str, &template_size);
     if (template == NULL) {

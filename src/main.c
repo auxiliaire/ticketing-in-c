@@ -123,8 +123,12 @@ int main(int argc, char *argv[]) {
         sqlite3_close(_db);
         exit(EXIT_FAILURE);
     }
+
+    // Initialize application context
     _ctx.db = _db;
     _ctx.layout = g_string_new(LAYOUT_VIEW);
+    _ctx.url_matches = NULL;
+
     // Initialize webserver
     mg_log_set(s_debug_level);
     mg_mgr_init(&mgr);

@@ -7,6 +7,7 @@
 typedef struct context {
     void *db;
     GString *layout;
+    GList *url_matches;
 } application_context;
 
 #endif
