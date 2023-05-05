@@ -13,8 +13,10 @@ void *get_handle(GString *library_key);
 GHashTable *get_action_table();
 GHashTable *get_handle_table();
 ActionDelegate get_action_delegate(GString *method, GString *controller, GString *action);
+GString *get_parameterized_action(const GString *method);
 
 
+// TODO: factor dynamic loading out
 bool default_route_try(struct mg_connection* c, void* ev_data, application_context* ctx) {
     struct mg_http_message *hm = ev_data;
     struct mg_str parts[3];
@@ -47,7 +49,7 @@ bool default_route_try(struct mg_connection* c, void* ev_data, application_conte
                     MG_INFO(("\t\tmatch: %s", word));
                     matches = g_list_append(matches, word);
                     // g_free(word);
-                    action = g_string_new("index");
+                    action = get_parameterized_action(method);
                     g_match_info_next(match_info, &error);
                 }
                 ctx->url_matches = matches;
@@ -104,6 +106,27 @@ exitwithcleanup:
 exit:
 
     return exitcode;
+}
+
+
+GString * get_parameterized_action(const GString* method) {
+    GString *action = NULL;
+    GString *mtest = g_string_new("get");
+    if (g_string_equal(method, mtest)) {
+        action = g_string_new("show");
+    } else {
+        g_string_assign(mtest, "put");
+        if (g_string_equal(method, mtest)) {
+            action = g_string_new("update");
+        } else {
+            g_string_assign(mtest, "delete");
+            if (g_string_equal(method, mtest)) {
+                action = g_string_new("one");
+            }
+        }
+    }
+    g_string_free(mtest, TRUE);
+    return action;
 }
 
 

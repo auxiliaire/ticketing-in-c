@@ -22,7 +22,7 @@ static int s_debug_level = MG_LL_INFO;
 static const char *s_root_dir = ".";
 static const char *s_listening_address = "http://0.0.0.0:8000";
 static const char *s_enable_hexdump = "no";
-static const char *s_ssi_pattern = "#.html";
+static const char *s_ssi_pattern = "#.shtml";
 
 /* DATABASE*/
 static const char *s_database = "./dev.sqlite";

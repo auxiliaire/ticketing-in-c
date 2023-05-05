@@ -8,6 +8,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(SQLITE REQUIRED sqlite3)
 pkg_check_modules(JSONC REQUIRED json-c)
+pkg_check_modules(LIBMUSTACH REQUIRED libmustach)
 pkg_check_modules(LIBMUSTACH_JSONC REQUIRED libmustach-json-c)
 
 find_package(SQLite3)
@@ -15,6 +16,7 @@ find_package(SQLite3)
 include_directories(
     ${GLIB_INCLUDE_DIRS}
     ${JSONC_INCLUDE_DIRS}
+    ${LIBMUSTACH_INCLUDE_DIRS}
     ${LIBMUSTACH_JSONC_INCLUDE_DIRS}
 )
 link_directories(
@@ -22,11 +24,13 @@ link_directories(
     ${SQLite3_LIBRARIES}
     ${JSONC_LIBRARY_DIRS}
     ${LIBMUSTACH_JSONC_LIBRARY_DIRS}
+    ${LIBMUSTACH_JSONC_LIBRARY_DIRS}
 )
 
+file(GLOB SHARED_FILES src/site/render/*.c)
 file(GLOB_RECURSE LIB_FILES lib/*.c)
-add_library(tickets-controller MODULE ${CMAKE_CURRENT_SOURCE_DIR}/src/site/controller/tickets_controller.c ${LIB_FILES})
-add_library(default-controller MODULE ${CMAKE_CURRENT_SOURCE_DIR}/src/site/controller/default_controller.c ${LIB_FILES})
+add_library(tickets-controller MODULE ${CMAKE_CURRENT_SOURCE_DIR}/src/site/controller/tickets_controller.c ${LIB_FILES} ${SHARED_FILES})
+add_library(default-controller MODULE ${CMAKE_CURRENT_SOURCE_DIR}/src/site/controller/default_controller.c ${LIB_FILES} ${SHARED_FILES})
 
 file(GLOB SRC_FILES
     src/*.c
@@ -35,6 +39,7 @@ file(GLOB SRC_FILES
     src/data/ticket/*.c
     src/site/*.c
     src/site/default/*.c
+    ${SHARED_FILES}
 )
 add_executable(
     ticketing
@@ -54,12 +59,14 @@ target_include_directories(ticketing PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/ticket
     ${CMAKE_CURRENT_SOURCE_DIR}/src/site
     ${CMAKE_CURRENT_SOURCE_DIR}/src/site/default
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/site/render
 )
 target_link_libraries(
     ticketing
     ${SQLite3_LIBRARIES}
     ${GLIB_LINK_LIBRARIES}
     ${JSONC_LINK_LIBRARIES}
+    ${LIBMUSTACH_LIBRARIES}
     ${LIBMUSTACH_JSONC_LINK_LIBRARIES}
 )
 
@@ -73,6 +80,7 @@ target_link_libraries(
     ${SQLite3_LIBRARIES}
     ${GLIB_LINK_LIBRARIES}
     ${JSONC_LINK_LIBRARIES}
+    ${LIBMUSTACH_LIBRARIES}
     ${LIBMUSTACH_JSONC_LINK_LIBRARIES}
 )
 
@@ -86,5 +94,6 @@ target_link_libraries(
     ${SQLite3_LIBRARIES}
     ${GLIB_LINK_LIBRARIES}
     ${JSONC_LINK_LIBRARIES}
+    ${LIBMUSTACH_LIBRARIES}
     ${LIBMUSTACH_JSONC_LINK_LIBRARIES}
 )

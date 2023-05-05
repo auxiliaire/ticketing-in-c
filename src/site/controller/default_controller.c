@@ -1,41 +1,25 @@
 #include "default_controller.h"
 
-#include "json-c/json_object.h"
-#include "mustach/mustach.h"
-#include "mustach/mustach-json-c.h"
+#include "../render/layout.h"
 
 void get_index_action(struct mg_connection *c, void *ev_data, application_context *ctx) {
     struct mg_http_message *hm = ev_data;
 
-    size_t template_size = 0;
-    char *template = mg_file_read(&mg_fs_posix, ctx->layout->str, &template_size);
-    if (template == NULL) {
-        MG_ERROR(("Template read error: Error reading '%s'.", ctx->layout->str));
-    }
+    LayoutModel layout_model = {
+        .layout_filename = ctx->layout->str,
+        .title = "Welcome",
+        .content = "<nav class=\"bg-dark-subtle mb-3 ps-5\" aria-label=\"breadcrumb\"><ol class=\"breadcrumb\"><li class=\"breadcrumb-item active\" aria-current=\"page\"><i class=\"bi fa-solid fa-house\"></i> Home</li><li class=\"breadcrumb-item\"><a href=\"/tickets\" class=\"icon-link icon-link-hover\" style=\"--bs-icon-link-transform: translate3d(0, -.125rem, 0);text-decoration:none;\"><i class=\"bi fa-solid fa-ticket\"></i> Tickets</a></li></ol></nav><div class=\"container\"><h3 class=\"mt-4\">Welcome to our Ticketing platform</h3><span class=\"badge text-bg-primary\">Written in C</span><div class=\"row mt-4\"><b>Current routes:</b><ul><li><a href=\"/tickets\">Tickets</a></li></ul></div></div>",
+        .script = "<!-- No scripts this time -->"
+    };
 
-    struct json_object *o = json_object_new_object();
-    struct json_object *title_val = json_object_new_string("Welcome");
-    struct json_object *content_val = json_object_new_string("<div><h1>Welcome to our Ticketing platform</h1><span class=\"badge text-bg-primary\">Written in C</span></div><b>Current routes:</b><ul><li><a href=\"/tickets\">Tickets</a></li></ul>");
-    struct json_object *script_val = json_object_new_string("<!-- No scripts this time -->");
-    json_object_object_add(o, "title", title_val);
-    json_object_object_add(o, "content", content_val);
-    json_object_object_add(o, "script", script_val);
-
-    char *result = NULL;
-    size_t *rendered_size = 0;
-
-    int mr = mustach_json_c_mem(template, template_size, o, Mustach_With_AllExtensions, &result, rendered_size);
-    if (mr == MUSTACH_OK) {
-        mg_http_reply(c, 200, "Content-Type: text/html\r\n", "%s", result, rendered_size);
+    GString *render = render_layout(&layout_model);
+    if (render->len > 0) {
+        mg_http_reply(c, 200, "Content-Type: text/html\r\n", "%s", render->str, render->len);
     } else {
-        MG_ERROR(("Template error: %d", mr));
-
         struct mg_http_serve_opts opts = {0};
         opts.root_dir = ".";
         opts.ssi_pattern = "*.html";
         mg_http_serve_file(c, hm, "view/500.html", &opts);
     }
-
-    json_object_put(o);
-
+    g_string_free(render, TRUE);
 }
