@@ -11,5 +11,6 @@ typedef void (*ActionDelegate)(struct mg_connection *c, void *ev_data, applicati
 
 bool default_route_try(struct mg_connection *c, void *ev_data, application_context *ctx);
 void default_route_handle(struct mg_connection *c, void *ev_data, application_context *ctx);
+void default_route_cleanup();
 
 #endif

@@ -10,4 +10,6 @@ typedef struct context {
     GList *url_matches;
 } application_context;
 
+void reset_url_matches(application_context *ctx);
+
 #endif

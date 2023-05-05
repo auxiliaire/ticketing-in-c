@@ -15,7 +15,7 @@ void get_index_action(struct mg_connection* c, void* ev_data, application_contex
         MG_INFO(("\t\tparam: %s", param->data));
     }
     g_list_free(param);
-    ctx->url_matches = NULL;
+    reset_url_matches(ctx);
 
     LayoutModel layout_model = {
         .layout_filename = ctx->layout->str,
@@ -64,7 +64,7 @@ void get_show_action(struct mg_connection* c, void* ev_data, application_context
         );
     }
     g_list_free(param);
-    ctx->url_matches = NULL;
+    reset_url_matches(ctx);
 
     LayoutModel layout_model = {
         .layout_filename = ctx->layout->str,
@@ -82,7 +82,7 @@ void get_show_action(struct mg_connection* c, void* ev_data, application_context
         opts.ssi_pattern = "#.shtml";
         mg_http_serve_file(c, hm, "view/500.html", &opts);
     }
-    g_string_free(script, FALSE);
+    g_string_free(script, TRUE);
     g_string_free(render, TRUE);
 }
 

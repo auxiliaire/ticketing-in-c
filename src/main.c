@@ -149,6 +149,8 @@ int main(int argc, char *argv[]) {
 
     // Cleanup
     mg_mgr_free(&mgr);
+    g_string_free(_ctx.layout, TRUE);
+    default_route_cleanup();
     MG_INFO(("Exiting on signal %d", s_signo));
     MG_INFO(("Closing database connection to '%s'", s_database));
     sqlite3_close(_db);

@@ -11,7 +11,7 @@ GString *render_layout(const LayoutModel* layout_model) {
     char *result = NULL;
     size_t rendered_size = 0;
     GError *error = NULL;
-    GString *render;
+    GString *render = g_string_new("");
 
     gboolean success = g_file_get_contents(layout_model->layout_filename, &template, &template_size, &error);
     if (!success) {
@@ -29,10 +29,11 @@ GString *render_layout(const LayoutModel* layout_model) {
 
     int mr = mustach_json_c_mem(template, template_size, o, Mustach_With_AllExtensions, &result, &rendered_size);
     if (mr == MUSTACH_OK) {
-        render = g_string_new_len(result, rendered_size);
+        render = g_string_append_len(render, result, rendered_size);
+        free(result);
+        g_free(template);
     } else {
         g_warning("Template error: %d", mr);
-        render = g_string_new("");
     }
     json_object_put(o);
     return render;
