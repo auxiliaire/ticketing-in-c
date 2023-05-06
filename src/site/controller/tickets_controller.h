@@ -13,6 +13,7 @@ void get_create_action(struct mg_connection* c, void* ev_data, application_conte
 void get_show_action(struct mg_connection* c, void* ev_data, application_context* ctx);
 void get_edit_action(struct mg_connection* c, void* ev_data, application_context* ctx);
 void put_update_action(struct mg_connection* c, void* ev_data, application_context* ctx);
+void post_update_action(struct mg_connection* c, void* ev_data, application_context* ctx);
 void delete_one_action(struct mg_connection* c, void* ev_data, application_context* ctx);
 
 #endif

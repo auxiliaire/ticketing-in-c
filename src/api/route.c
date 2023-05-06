@@ -23,7 +23,7 @@ void api_route_handle(struct mg_connection *c, void *ev_data, struct mg_str part
     MG_INFO(("\t\t(%s) / (%s)", controller->str, action->str));
     struct mg_http_message *hm = ev_data;
 
-    if (mg_match(hm->uri, mg_str("/api/tickets/*"), NULL)) {
+    if (mg_http_match_uri(hm, "/api/tickets/*")) {
 
         if (mg_match(mg_str(action->str), mg_str("world"), NULL)) {
             GString *json = tickets_fetch_all(ctx->db);

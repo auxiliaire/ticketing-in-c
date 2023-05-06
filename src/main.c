@@ -10,6 +10,7 @@
 
 #include "../lib/mongoose.h"
 
+#include "static/route.h"
 #include "api/route.h"
 #include "site/default/route.h"
 
@@ -37,10 +38,14 @@ static void signal_handler(int signo) {
 
 static void http_dispatcher(struct mg_connection *c, int ev, void *ev_data, void *ctx) {
     if (ev == MG_EV_HTTP_MSG) {
-        struct mg_http_message *hm = ev_data, tmp = {0};
+        struct mg_http_message *hm = ev_data;
 
         // TODO: refactor this if to a loop
-        if (api_route_try(c, ev_data, ctx)) {
+        if (static_route_try(c, ev_data, ctx)) {
+            /* STATIC */
+            return;
+
+        } else if (api_route_try(c, ev_data, ctx)) {
             /* API */
             return;
 
@@ -49,23 +54,10 @@ static void http_dispatcher(struct mg_connection *c, int ev, void *ev_data, void
             return;
 
         } else {
-            /* SERVE FILES */
-            // TODO: factor out to route.
-            struct mg_str unknown = mg_str_n("?", 1), *cl;
-            struct mg_http_serve_opts opts = {
-                .root_dir = s_root_dir,
-                .ssi_pattern = s_ssi_pattern,
-                .mime_types = "htm=text/html,html=text/html",
-                .page404 = "./view/404.html"
-            };
-            mg_http_serve_dir(c, hm, &opts);
-            mg_http_parse((char *) c->send.buf, c->send.len, &tmp);
-            cl = mg_http_get_header(&tmp, "Content-Length");
-            if (cl == NULL) cl = &unknown;
-            MG_INFO(("%.*s %.*s %.*s %.*s", (int) hm->method.len, hm->method.ptr,
-                     (int) hm->uri.len, hm->uri.ptr, (int) tmp.uri.len, tmp.uri.ptr,
-                     (int) cl->len, cl->ptr));
-
+            /* 404 */
+            struct mg_http_serve_opts opts = {0};
+            opts.root_dir = s_root_dir;
+            mg_http_serve_file(c, hm, "view/404.html", &opts);
         }
     }
 }
@@ -128,6 +120,7 @@ int main(int argc, char *argv[]) {
     _ctx.db = _db;
     _ctx.layout = g_string_new(LAYOUT_VIEW);
     _ctx.url_matches = NULL;
+    _ctx.root_dir = s_root_dir;
 
     // Initialize webserver
     mg_log_set(s_debug_level);

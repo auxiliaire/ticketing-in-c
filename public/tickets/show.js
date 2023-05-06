@@ -8,8 +8,9 @@ const Ticket = function (props) {
     setTicket(props.ticket);
   }, [props.ticket]);
   return html`
-<h3>${ticket.title}</h3>
-    <div class="container-sm mt-4">
+  <div>
+    <h3>${ticket.title}</h3>
+      <div class="container-sm mt-4">
         <div class="card">
             <div class="card-body">
                 <div class="row">
@@ -34,8 +35,9 @@ const Ticket = function (props) {
                 </div>
             </div>
         </div>
-    </div>
-    <a class="btn btn-warning btn-sm mt-4" href="/tickets/edit?id=${ticket.id}" type="button"><i class="fa-solid fa-pen"></i> Edit</a>`;
+      </div>
+    <a class="btn btn-primary btn-sm mt-4" href="/tickets/edit/${ticket.id}" type="button"><i class="fa-solid fa-pen"></i> Edit</a>
+  </div>`;
 };
 
 const App = function (props) {
@@ -52,17 +54,18 @@ const App = function (props) {
   }, []);
 
   return html`
-<nav class="bg-dark-subtle mb-3 ps-5" aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="/" class="icon-link icon-link-hover" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);text-decoration:none;"><i class="bi fa-solid fa-house"></i> Home</a></li>
-    <li class="breadcrumb-item"><a href="/tickets" class="icon-link icon-link-hover" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);text-decoration:none;"><i class="bi fa-solid fa-ticket"></i> Tickets</a></li>
-    <li class="breadcrumb-item active" aria-current="page">${tickets[0]? tickets[0].id : 'View'}</li>
-  </ol>
-</nav>
-<div class="container mt-4">
-  ${h(Ticket, { ticket: tickets[0] || {} })}
-    <button type="button" class="btn btn-outline-primary btn-sm mt-4 ms-2" onclick=${getTickets}><i class="fa-solid fa-rotate-left"></i> Refresh</button>
-</div>
+  <div>
+    <nav class="bg-dark-subtle mb-3 ps-5" aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="icon-link icon-link-hover" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);text-decoration:none;"><i class="bi fa-solid fa-house"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="/tickets" class="icon-link icon-link-hover" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);text-decoration:none;"><i class="bi fa-solid fa-ticket"></i> Tickets</a></li>
+        <li class="breadcrumb-item active" aria-current="page">${tickets[0]? tickets[0].id : 'View'}</li>
+      </ol>
+    </nav>
+    <div class="container mt-4">
+      ${h(Ticket, { ticket: tickets[0] || {} })}
+    </div>
+  </div>
 `;
 };
 

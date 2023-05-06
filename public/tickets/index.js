@@ -50,19 +50,21 @@ const App = function (props) {
   }, []);
 
   return html`
-<nav class="bg-dark-subtle mb-3 ps-5" aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="/" class="icon-link icon-link-hover" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);text-decoration:none;"><i class="bi fa-solid fa-house"></i> Home</a></li>
-    <li class="breadcrumb-item active" aria-current="page"><i class="fa-solid fa-ticket"></i> Tickets</li>
-  </ol>
-</nav>
-<div class="container mt-4">
-  <h3>Tickets</h3>
-  <div class="container">
-    ${h(Tickets, { tickets })}
+  <div>
+    <nav class="bg-dark-subtle mb-3 ps-5" aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="icon-link icon-link-hover" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);text-decoration:none;"><i class="bi fa-solid fa-house"></i> Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><i class="fa-solid fa-ticket"></i> Tickets</li>
+      </ol>
+    </nav>
+    <div class="container mt-4">
+      <h3>Tickets</h3>
+      <div class="container">
+        ${h(Tickets, { tickets })}
+        <button type="button" class="btn btn-outline-primary btn-sm mt-4" onclick=${getTickets}><i class="fa-solid fa-rotate-left"></i> Refresh</button>
+      </div>
+    </div>
   </div>
-  <button type="button" class="btn btn-outline-primary btn-sm mt-4" onclick=${getTickets}><i class="fa-solid fa-rotate-left"></i> Refresh</button>
-</div>
   `;
 };
 
