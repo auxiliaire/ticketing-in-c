@@ -37,3 +37,29 @@ GString *tickets_fetch_one(sqlite3 *db, sqlite3_int64 id) {
 
     return fetch_as_json(ppStmt);
 }
+
+int tickets_upsert_one(sqlite3* db, char* sql, int len) {
+    sqlite3_stmt *ppStmt;
+    int rc = sqlite3_prepare_v2(db, sql, len, &ppStmt, NULL);
+
+    if (rc != SQLITE_OK) {
+        char *zErrMsg = 0;
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+        return 0;
+    }
+
+    rc = sqlite3_step(ppStmt);
+
+    if (rc != SQLITE_DONE) {
+        char *zErrMsg = 0;
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+        return 0;
+    }
+
+    sqlite3_finalize(ppStmt);
+
+    return 1;
+}
+

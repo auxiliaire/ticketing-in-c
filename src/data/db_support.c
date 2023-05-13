@@ -40,6 +40,7 @@ GList *fetch_as_list(sqlite3_stmt *ppStmt, allocator_fn allocator, setter_fn set
 GString *fetch_as_json(sqlite3_stmt *ppStmt) {
     // Open bracket:
     GString *json = g_string_new("[");
+    GString *text = g_string_new("");
 
     int rc = sqlite3_step(ppStmt);
     int ncols = sqlite3_column_count(ppStmt);
@@ -62,7 +63,10 @@ GString *fetch_as_json(sqlite3_stmt *ppStmt) {
                 g_string_append_printf(json, "\"%s\":null", colName);
                 break;
             default: /* TEXT | BLOB */
-                g_string_append_printf(json, "\"%s\":\"%s\"", colName, sqlite3_column_text(ppStmt, i));
+                g_string_printf(text, "%s", sqlite3_column_text(ppStmt, i));
+                g_string_replace(text, "\r\n", "\\n", 0);
+                g_string_replace(text, "\n", "\\n", 0);
+                g_string_append_printf(json, "\"%s\":\"%s\"", colName, text->str);
             }
         }
         g_string_append_c(json, '}');
@@ -74,5 +78,6 @@ GString *fetch_as_json(sqlite3_stmt *ppStmt) {
 
     sqlite3_finalize(ppStmt);
 
+    g_string_free(text, TRUE);
     return json;
 }

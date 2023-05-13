@@ -9,9 +9,9 @@ const Ticket = function (props) {
   }, [props.ticket]);
   return html`
     <div class="container-sm mt-4">
-        <h3><i class="fa-solid fa-pen"></i> Edit ticket</h3>
-        <form action="/tickets/${ticket.id}" method="post">
-            <input type="hidden" class="form-control" name="id" id="id" value=${ticket.id} />
+        <h3><i class="fa-solid fa-plus"></i> Create New Ticket</h3>
+        <form action="/tickets" method="post">
+            <input type="hidden" class="form-control" name="id" id="id" value="" />
             <div class="row mb-3">
                 <label for="title" class="col-sm-2 col-form-label">Title</label>
                 <div class="col-sm-10">
@@ -39,27 +39,17 @@ const Ticket = function (props) {
 const App = function (props) {
   const [tickets, setTickets] = useState([]);
 
-  const getTickets = () =>
-    fetch('/api/tickets/' + props.id)
-      .then(r => r.json())
-      .then(r => setTickets(r))
-      .catch(err => console.log(err));
-
-  useEffect(() => {
-    getTickets();
-  }, []);
-
   return html`
   <div>
     <nav class="bg-dark-subtle mb-3 ps-5" aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/" class="icon-link icon-link-hover" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);text-decoration:none;"><i class="bi fa-solid fa-house"></i> Home</a></li>
             <li class="breadcrumb-item"><a href="/tickets" class="icon-link icon-link-hover" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);text-decoration:none;"><i class="bi fa-solid fa-ticket"></i> Tickets</a></li>
-            <li class="breadcrumb-item active" aria-current="page">${tickets[0]? tickets[0].id : 'View'}</li>
+            <li class="breadcrumb-item active" aria-current="page">New</li>
         </ol>
     </nav>
     <div class="container mt-4">
-    ${h(Ticket, { ticket: tickets[0] || {} })}
+    ${h(Ticket, { ticket: {} })}
     </div>
   </div>
 `;

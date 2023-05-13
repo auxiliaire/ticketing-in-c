@@ -27,7 +27,7 @@ link_directories(
     ${LIBMUSTACH_JSONC_LIBRARY_DIRS}
 )
 
-file(GLOB SHARED_FILES src/site/render/*.c src/context.c)
+file(GLOB SHARED_FILES src/site/render/*.c src/context.c src/data/*.c)
 file(GLOB_RECURSE LIB_FILES lib/*.c)
 add_library(tickets-controller MODULE ${CMAKE_CURRENT_SOURCE_DIR}/src/site/controller/tickets_controller.c ${LIB_FILES} ${SHARED_FILES})
 add_library(default-controller MODULE ${CMAKE_CURRENT_SOURCE_DIR}/src/site/controller/default_controller.c ${LIB_FILES} ${SHARED_FILES})

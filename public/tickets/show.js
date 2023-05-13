@@ -31,7 +31,7 @@ const Ticket = function (props) {
             <div class="card-body">
                 <h5 class="card-title">Description</h5>
                 <div class="row">
-                    <div class="col-5"><p>${ticket.description}</p></div>
+                    <div class="col-5"><p>${ticket.description ? ticket.description.split('\n').map(line => html`${line}<br/>`) : ''}</p></div>
                 </div>
             </div>
         </div>

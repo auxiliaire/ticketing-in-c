@@ -17,7 +17,7 @@ const Tickets = function (props) {
         <th scope="col">Created At</th>
         <th scope="col">Created By</th>
         <th scope="col">Score</th>
-        <th></th>
+        <th scope="col"><i class="fa-solid fa-wrench"></i></th>
       </tr>
     </thead>
     <tbody>
@@ -29,7 +29,19 @@ const Tickets = function (props) {
         <td>${ticket.created_at}</td>
         <td>${ticket.created_by}</td>
         <td>${ticket.score}</td>
-        <td><a href="/tickets/${ticket.id}" type="button" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-binoculars"></i></a></td>
+        <td>
+          <form method="post" action="/tickets/delete">
+            <input type="hidden" name="id" value=${ticket.id} />
+            <div class="btn-toolbar" role="toolbar">
+              <div class="btn-group btn-group-sm me-1" role="group">
+                <a href="/tickets/${ticket.id}" type="button" class="col btn btn-outline-primary btn-sm"><i class="fa-solid fa-binoculars"></i></a>
+              </div>
+              <div class="btn-group btn-group-sm mt-1" role="group">
+                <button type="submit" class="col btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
+          </form>
+        </td>
       </tr>
     `)}
     </tbody>
@@ -62,6 +74,7 @@ const App = function (props) {
       <div class="container">
         ${h(Tickets, { tickets })}
         <button type="button" class="btn btn-outline-primary btn-sm mt-4" onclick=${getTickets}><i class="fa-solid fa-rotate-left"></i> Refresh</button>
+        <a href="/tickets/new" class="btn btn-primary btn-sm mt-4 ms-2"><i class="fa-solid fa-plus"></i> New Ticket</a>
       </div>
     </div>
   </div>
