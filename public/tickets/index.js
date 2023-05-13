@@ -73,8 +73,8 @@ const App = function (props) {
       <h3>Tickets</h3>
       <div class="container">
         ${h(Tickets, { tickets })}
-        <button type="button" class="btn btn-outline-primary btn-sm mt-4" onclick=${getTickets}><i class="fa-solid fa-rotate-left"></i> Refresh</button>
-        <a href="/tickets/new" class="btn btn-primary btn-sm mt-4 ms-2"><i class="fa-solid fa-plus"></i> New Ticket</a>
+        <button type="button" class="btn btn-outline-primary btn-sm my-4" onclick=${getTickets}><i class="fa-solid fa-rotate-left"></i> Refresh</button>
+        <a href="/tickets/new" class="btn btn-primary btn-sm my-4 ms-2"><i class="fa-solid fa-plus"></i> New Ticket</a>
       </div>
     </div>
   </div>
