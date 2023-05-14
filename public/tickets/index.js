@@ -1,13 +1,13 @@
 'use strict';
 import { h, html, render, useEffect, useState } from '../dist/preact.min.js';
 
-
 const Tickets = function (props) {
-  const [tickets, setTickets] = useState(props.tickets || []);
+  const [ tickets, setTickets ] = useState(props.tickets || []);
 
   useEffect(() => {
     setTickets(props.tickets);
   }, [props.tickets]);
+
   return html`<table class="table table-striped table-hover">
     <thead>
       <tr>
@@ -30,14 +30,14 @@ const Tickets = function (props) {
         <td>${ticket.created_by}</td>
         <td>${ticket.score}</td>
         <td>
-          <form method="post" action="/tickets/delete">
+          <form id="tdf_${ticket.id}" method="post" action="/tickets/delete">
             <input type="hidden" name="id" value=${ticket.id} />
             <div class="btn-toolbar" role="toolbar">
               <div class="btn-group btn-group-sm me-1" role="group">
                 <a href="/tickets/${ticket.id}" type="button" class="col btn btn-outline-primary btn-sm"><i class="fa-solid fa-binoculars"></i></a>
               </div>
               <div class="btn-group btn-group-sm mt-1" role="group">
-                <button type="submit" class="col btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                <button type="button" class="col btn btn-outline-danger btn-sm" onclick=${() => props.setCurrent(ticket)} data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="fa-solid fa-trash"></i></button>
               </div>
             </div>
           </form>
@@ -48,13 +48,50 @@ const Tickets = function (props) {
     </table>`;
 };
 
+const Modal = function (props) {
+  const [ currentTicket, setCurrentTicket ] = useState(props.currentTicket || { id: null, title: '' });
+
+  useEffect(() => {
+    setCurrentTicket(props.currentTicket);
+  }, [props.currentTicket]);
+
+  const doDelete = () => {
+    const form = document.getElementById('tdf_' + currentTicket.id);
+    const dcModal = bootstrap.Modal.getInstance('#deleteConfirmModal');
+    dcModal.hide();
+    if (form) {
+      form.submit();
+    }
+  };
+
+  return html`
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="dcModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="dcModalLabel">Are you sure you want to delete this ticket?</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            ${currentTicket.title} (${currentTicket.id})
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button id="dcBtnDelete" type="button" class="btn btn-danger" onclick=${doDelete}>Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
 const App = function (props) {
-  const [tickets, setTickets] = useState([]);
+  const [ state, setState ] = useState({ tickets: [], current: { id: null, title: '' }});
 
   const getTickets = () =>
     fetch('/api/tickets/')
       .then(r => r.json())
-      .then(r => setTickets(r))
+      .then(r => setState({ tickets: r, current: state.current }))
       .catch(err => console.log(err));
 
   useEffect(() => {
@@ -72,11 +109,12 @@ const App = function (props) {
     <div class="container mt-4">
       <h3>Tickets</h3>
       <div class="container">
-        ${h(Tickets, { tickets })}
+        ${h(Tickets, { tickets: state.tickets, setCurrent: (ticket) => setState({ tickets: state.tickets, current: ticket }) })}
         <button type="button" class="btn btn-outline-primary btn-sm my-4" onclick=${getTickets}><i class="fa-solid fa-rotate-left"></i> Refresh</button>
         <a href="/tickets/new" class="btn btn-primary btn-sm my-4 ms-2"><i class="fa-solid fa-plus"></i> New Ticket</a>
       </div>
     </div>
+    ${h(Modal, { currentTicket: state.current })}
   </div>
   `;
 };
