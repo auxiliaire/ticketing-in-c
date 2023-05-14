@@ -23,6 +23,7 @@ typedef struct ticket {
 } Ticket;
 
 Ticket *ticket_new();
+void ticket_delete(Ticket *ticket);
 
 int64_t ticket_get_id(Ticket *ticket);
 GString *ticket_get_title(Ticket *ticket);
@@ -35,7 +36,7 @@ void ticket_set_id(Ticket *ticket, int64_t id);
 void ticket_set_title(Ticket *ticket, GString *title);
 void ticket_set_desctiption(Ticket *ticket, GString *description);
 void ticket_set_created_at(Ticket *ticket, GString *created_at);
-void ticket_set_created_by(Ticket *ticket, int64_t id);
-void ticket_set_score(Ticket *ticket, double id);
+void ticket_set_created_by(Ticket *ticket, int64_t created_by);
+void ticket_set_score(Ticket *ticket, double score);
 
 #endif

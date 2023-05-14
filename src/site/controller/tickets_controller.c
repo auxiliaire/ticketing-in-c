@@ -20,8 +20,8 @@ void post_index_action(struct mg_connection* c, void* ev_data, application_conte
     int id_len = mg_http_get_var(&hm->body, "id", _id, sizeof(_id));
     if (id_len < 0) goto error;
     if (id_len == 0) {
-        id_len = 4;
-        id = "null";
+        id_len = 1;
+        id = "0";
         new = true;
     } else {
         id = _id;
@@ -44,20 +44,17 @@ void post_index_action(struct mg_connection* c, void* ev_data, application_conte
     MG_INFO(("\tScore: \t\t'%.*s'", score_len, score));
     MG_INFO(("\tDescription: \t'%.*s'", desc_len, desc));
 
-    GString *sql = g_string_new("");
-    g_string_printf(sql, "INSERT INTO tickets (id, title, description, created_at, created_by, score) VALUES (%.*s,'%.*s','%.*s','2023-05-13 18:23:00',1,%.*s) ON CONFLICT(id) DO UPDATE SET title='%.*s',description='%.*s',score=%.*s WHERE id=%.*s;",
-                    id_len,     id,
-                    title_len,  title,
-                    desc_len,   desc,
-                    score_len,  score,
-                    title_len,  title,
-                    desc_len,   desc,
-                    score_len,  score,
-                    id_len,     id
-                );
-    MG_INFO(("SQL: '%.*s'", sql->len, sql->str));
+    Ticket *ticket = ticket_new();
+    ticket_set_id(ticket, mg_to64(mg_str_n(id, id_len)));
+    ticket_set_title(ticket, g_string_new_len(title, title_len));
+    ticket_set_desctiption(ticket, g_string_new_len(desc, desc_len));
+    ticket_set_score(ticket, g_strtod(score, NULL));
+    // Will be ignored on update:
+    GString *datetime = g_string_new(g_date_time_format(g_date_time_new_now_utc(), "%F %T"));
+    ticket_set_created_at(ticket, datetime);
+    ticket_set_created_by(ticket, 1);
 
-    int res = tickets_upsert_one(ctx->db, sql->str, sql->len);
+    int res = tickets_upsert_one(ctx->db, ticket);
 
     MG_INFO(("\t%d inserted", res));
 
@@ -70,8 +67,8 @@ void post_index_action(struct mg_connection* c, void* ev_data, application_conte
 
     mg_http_reply(c, 302, location->str, "");
 
-    g_string_free(sql, TRUE);
     g_string_free(location, TRUE);
+    ticket_delete(ticket);
     return;
 error:
     mg_http_reply(c, 200, "Content-Type: text/html\r\n", "%s", "post index, malformed data");
@@ -240,11 +237,7 @@ void post_delete_action(struct mg_connection* c, void* ev_data, application_cont
 
     MG_INFO(("\tId: \t\t'%.*s'", id_len, id));
 
-    GString *sql = g_string_new("");
-    g_string_printf(sql, "DELETE FROM tickets WHERE id=%.*s LIMIT 1;", id_len, id);
-    MG_INFO(("SQL: '%.*s'", sql->len, sql->str));
-
-    int res = tickets_upsert_one(ctx->db, sql->str, sql->len);
+    int res = tickets_delete_one(ctx->db, mg_to64(mg_str_n(id, id_len)));
 
     MG_INFO(("\t%d deleted", res));
 
@@ -252,7 +245,6 @@ void post_delete_action(struct mg_connection* c, void* ev_data, application_cont
 
     mg_http_reply(c, 302, "Location: /tickets\r\n", "");
 
-    g_string_free(sql, TRUE);
     return;
 error:
     mg_http_reply(c, 200, "Content-Type: text/html\r\n", "%s", "post delete, malformed data");
