@@ -147,14 +147,31 @@ const Modal = function (props) {
   `;
 };
 
+const Spinner = function (props) {
+  const [ display, setDisplay ] = useState('d-block');
+
+  useLayoutEffect(() => {
+    setDisplay(props.isShown() ? 'd-block' : 'd-none');
+  }, [props.isShown]);
+  return html`
+    <div class="d-flex justify-content-center ${display}">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  `;
+};
+
 const App = function (props) {
   const [ state, setState ] = useState({ tickets: [], current: { id: null, title: '' }});
 
-  const getTickets = () =>
+  const getTickets = () => {
+    setState({ tickets: [], current: { id: null, title: '' }});
     fetch('/tickets', { method: "GET", headers: { "Accept": "application/json" }})
       .then(r => r.json())
       .then(r => setState({ tickets: r, current: state.current }))
       .catch(err => console.log(err));
+  };
 
   useEffect(() => {
     getTickets();
@@ -171,6 +188,7 @@ const App = function (props) {
     <div class="container mt-4">
       <h3>Tickets</h3>
       <div class="container">
+        ${h(Spinner, { isShown: () => state.tickets.length === 0})}
         ${h(Tickets, { tickets: state.tickets, setCurrent: (ticket) => setState({ tickets: state.tickets, current: ticket }) })}
         <button type="button" class="btn btn-outline-primary btn-sm my-4" onclick=${getTickets}><i class="fa-solid fa-rotate-left"></i> Refresh</button>
         <a href="/tickets/new" class="btn btn-primary btn-sm my-4 ms-2"><i class="fa-solid fa-plus"></i> New Ticket</a>
