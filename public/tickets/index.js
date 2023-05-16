@@ -1,25 +1,87 @@
 'use strict';
-import { h, html, render, useEffect, useState } from '../dist/preact.min.js';
+import { h, html, render, useEffect, useLayoutEffect, useState } from '../dist/preact.min.js';
+
+const Caret = function (props) {
+  const [ sort, setSort ] = useState(props.sort || null);
+  const [ order, setOrder ] = useState(props.order || 1);
+  const [ dir, setDir ] = useState('up');
+  const [ display, setDisplay ] = useState('visually-hidden');
+
+  const getDisplay = () => {
+    return props.id === sort ? '' : 'visually-hidden';
+  };
+
+  useEffect(() => {
+    setSort(props.sort);
+  }, [props.sort]);
+
+  useEffect(() => {
+    setOrder(props.order);
+  }, [props.order]);
+
+  useEffect(() => {
+    setDisplay(getDisplay());
+  }, [sort, order]);
+
+  useEffect(() => {
+    setDir(order > 0 ? 'up' : 'down');
+  }, [order]);
+
+  return html`
+    <i class="fa-solid fa-caret-${dir} ${display}"></i>
+  `;
+};
+
+const SortHead = function (props) {
+  const [ sort, setSort ] = useState(props.sort);
+  const [ order, setOrder ] = useState(props.order || 1);
+
+  const sortBy = (column) => {
+    if (sort === column) {
+      setOrder(-1 * order);
+    }
+    setSort(column);
+  };
+
+  useLayoutEffect(() => {
+    props.resort(sort, order);
+  }, [sort, order]);
+
+  return html`
+    <thead>
+      <tr>
+        <th scope="col"><a href="#" class="text-nowrap link-dark link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('id'); e.preventDefault(); }}>Id ${h(Caret, { id: 'id', sort, order })}</a></th>
+        <th scope="col"><a href="#" class="text-nowrap link-dark link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('title'); e.preventDefault(); }}>Title ${h(Caret, { id: 'title', sort, order })}</a></th>
+        <th scope="col"><a href="#" class="text-nowrap link-dark link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('description'); e.preventDefault(); }}>Description ${h(Caret, { id: 'description', sort, order })}</a></th>
+        <th scope="col"><a href="#" class="text-nowrap link-dark link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('created_at'); e.preventDefault(); }}>Created At ${h(Caret, { id: 'created_at', sort, order })}</a></th>
+        <th scope="col"><a href="#" class="text-nowrap link-dark link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('created_by'); e.preventDefault(); }}>Created By ${h(Caret, { id: 'created_by', sort, order })}</a></th>
+        <th scope="col"><a href="#" class="text-nowrap link-dark link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('score'); e.preventDefault(); }}>Score ${h(Caret, { id: 'score', sort, order })}</a></th>
+        <th scope="col"><i class="fa-solid fa-wrench"></i></th>
+      </tr>
+    </thead>
+  `;
+}
 
 const Tickets = function (props) {
   const [ tickets, setTickets ] = useState(props.tickets || []);
+
+  const resort = (column, order) => {
+    tickets.sort((a, b) => {
+      if (Number.isFinite(a[column]) && Number.isFinite(b[column])) {
+        return order * (a[column] - b[column]);
+      } else {
+        return order * String(a[column]).localeCompare(String(b[column]));
+      }
+    });
+    setTickets([...tickets]);
+  };
 
   useEffect(() => {
     setTickets(props.tickets);
   }, [props.tickets]);
 
   return html`<table class="table table-striped table-hover">
-    <thead>
-      <tr>
-        <th scope="col">Id</th>
-        <th scope="col">Title</th>
-        <th scope="col">Description</th>
-        <th scope="col">Created At</th>
-        <th scope="col">Created By</th>
-        <th scope="col">Score</th>
-        <th scope="col"><i class="fa-solid fa-wrench"></i></th>
-      </tr>
-    </thead>
+    ${h(SortHead, { resort })}
     <tbody>
     ${tickets.map(ticket => html`
       <tr key=${ticket.id}>
