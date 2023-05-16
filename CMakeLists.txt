@@ -34,7 +34,6 @@ add_library(default-controller MODULE ${CMAKE_CURRENT_SOURCE_DIR}/src/site/contr
 
 file(GLOB SRC_FILES
     src/*.c
-    src/api/*.c
     src/aux/*c
     src/data/*.c
     src/data/ticket/*.c
@@ -56,7 +55,6 @@ target_compile_options(
 )
 target_include_directories(ticketing PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/api
     ${CMAKE_CURRENT_SOURCE_DIR}/src/aux
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/ticket

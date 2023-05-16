@@ -11,7 +11,6 @@
 #include "../lib/mongoose.h"
 
 #include "static/route.h"
-#include "api/route.h"
 #include "site/default/route.h"
 
 #define TICKETS_ROUTE "/tickets/*"
@@ -43,10 +42,6 @@ static void http_dispatcher(struct mg_connection *c, int ev, void *ev_data, void
         // TODO: refactor this if to a loop
         if (static_route_try(c, ev_data, ctx)) {
             /* STATIC */
-            return;
-
-        } else if (api_route_try(c, ev_data, ctx)) {
-            /* API */
             return;
 
         } else if (default_route_try(c, ev_data, ctx)) {

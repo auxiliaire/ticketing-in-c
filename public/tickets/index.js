@@ -89,7 +89,7 @@ const App = function (props) {
   const [ state, setState ] = useState({ tickets: [], current: { id: null, title: '' }});
 
   const getTickets = () =>
-    fetch('/api/tickets/')
+    fetch('/tickets', { method: "GET", headers: { "Accept": "application/json" }})
       .then(r => r.json())
       .then(r => setState({ tickets: r, current: state.current }))
       .catch(err => console.log(err));

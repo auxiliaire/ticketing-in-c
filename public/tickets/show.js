@@ -44,7 +44,7 @@ const App = function (props) {
   const [tickets, setTickets] = useState([]);
 
   const getTickets = () =>
-    fetch('/api/tickets/' + props.id)
+    fetch('/tickets/' + props.id, { method: "GET", headers: { "Accept": "application/json" }})
       .then(r => r.json())
       .then(r => setTickets(r))
       .catch(err => console.log(err));

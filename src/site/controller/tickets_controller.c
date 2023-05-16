@@ -74,17 +74,9 @@ error:
     mg_http_reply(c, 200, "Content-Type: text/html\r\n", "%s", "post index, malformed data");
 }
 
-void get_index_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
+void get_index_html_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
 
     struct mg_http_message *hm = ev_data;
-
-    GList *param;
-    for (param = ctx->url_matches; param != NULL; param = param->next) {
-        MG_INFO(("\t\tparam: %s", param->data));
-        return get_show_action(c, ev_data, ctx);
-    }
-    g_list_free(param);
-    reset_url_matches(ctx);
 
     GString *script = g_string_new("");
     render_script_template(script, "index.js", NULL);
@@ -106,6 +98,44 @@ void get_index_action(struct mg_connection* c, void* ev_data, application_contex
     }
     g_string_free(script, TRUE);
     g_string_free(render, TRUE);
+}
+
+void get_index_json_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
+    GString *json = tickets_fetch_all(ctx->db);
+    mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s\n", json->str);
+    g_string_free(json, TRUE);
+}
+
+void get_index_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
+    GList *param;
+    for (param = ctx->url_matches; param != NULL; param = param->next) {
+        MG_INFO(("\t\tparam: %s", param->data));
+        return get_show_action(c, ev_data, ctx);
+    }
+    g_list_free(param);
+    reset_url_matches(ctx);
+
+    struct mg_http_message *hm = (struct mg_http_message *) ev_data;
+    struct mg_str *s = mg_http_get_header(hm, "Accept");
+    GRegex *regex = g_regex_new("\\*/\\*", 0, 0, NULL);
+
+    if (s == NULL) {
+        // No Accept header
+        get_index_html_action(c, ev_data, ctx);
+
+    } else if (mg_match(*s, mg_str("#application/json#"), NULL)) {
+        // application/json
+        get_index_json_action(c, ev_data, ctx);
+
+    } else if (g_regex_match(regex, s->ptr, 0, NULL) || mg_match(*s, mg_str("#text/html#"), NULL)) {
+        // text/html, */*
+        get_index_html_action(c, ev_data, ctx);
+
+    } else {
+        // Reject
+        mg_http_reply(c, 406, "", "%s", "Not Acceptable\n");
+    }
+    g_regex_unref(regex);
 }
 
 void put_index_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
@@ -136,7 +166,7 @@ void get_new_action(struct mg_connection* c, void* ev_data, application_context*
     g_string_free(id, TRUE);
 }
 
-void get_show_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
+void get_show_html_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
 
     struct mg_http_message *hm = ev_data;
 
@@ -167,6 +197,45 @@ void get_show_action(struct mg_connection* c, void* ev_data, application_context
     }
     g_string_free(script, TRUE);
     g_string_free(render, TRUE);
+}
+
+void get_show_json_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
+    GList *param;
+    int64_t id;
+    for (param = ctx->url_matches; param != NULL; param = param->next) {
+        MG_INFO(("\t\tparam: %s", param->data));
+        id = mg_to64(mg_str((char*)param->data));
+    }
+    g_list_free(param);
+    reset_url_matches(ctx);
+
+    GString *json = tickets_fetch_one(ctx->db, id);
+    mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s\n", json->str);
+    g_string_free(json, TRUE);
+}
+
+void get_show_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
+    struct mg_http_message *hm = (struct mg_http_message *) ev_data;
+    struct mg_str *s = mg_http_get_header(hm, "Accept");
+    GRegex *regex = g_regex_new("\\*/\\*", 0, 0, NULL);
+
+    if (s == NULL) {
+        // No Accept header
+        get_index_html_action(c, ev_data, ctx);
+
+    } else if (mg_match(*s, mg_str("#application/json#"), NULL)) {
+        // application/json
+        get_show_json_action(c, ev_data, ctx);
+
+    } else if (g_regex_match(regex, s->ptr, 0, NULL) || mg_match(*s, mg_str("#text/html#"), NULL)) {
+        // text/html, */*
+        get_show_html_action(c, ev_data, ctx);
+
+    } else {
+        // Reject
+        mg_http_reply(c, 406, "", "%s", "Not Acceptable\n");
+    }
+    g_regex_unref(regex);
 }
 
 void get_edit_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
