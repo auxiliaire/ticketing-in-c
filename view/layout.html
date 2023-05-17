@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,17 +8,53 @@
     <link rel="stylesheet" href="/dist/bootstrap/css/bootstrap.min.css" />
     <script src="https://kit.fontawesome.com/7b8ed3b4d8.js" crossorigin="anonymous"></script>
   </head>
-  <body>
-    <nav class="navbar bg-body-tertiary">
-      <div class="container-fluid">
+  <body data-bs-spy="scroll">
+    <header class="navbar navbar-expand-lg bd-navbar sticky-top bg-body">
+      <nav class="container-xxl bd-gutter flex-wrap flex-lg-nowrap" aria-label="Main navigation">
         <a class="navbar-brand" href="/">
           <img src="/assets/brand/c-logo.png" alt="Logo" width="30" class="d-inline-block align-text-top">
           Ticketing in C
         </a>
+
+      <div class="offcanvas-body p-4 pt-0 p-lg-0 overflow-visible">
+        <ul class="navbar-nav flex-row-reverse flex-wrap ms-md-auto">
+          <li class="nav-item dropdown">
+            <button class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Toggle theme (dark)">
+              <i id="theme-icon-active" class="fa-solid fa-circle-half-stroke" style="width:16px" data-icon="fa-solid fa-circle-half-stroke"></i>
+              <span class="d-lg-none ms-2" id="bd-theme-text">Toggle theme</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme-text">
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                  <i class="fa-regular fa-sun" style="width:16px" data-icon="fa-solid fa-sun"></i>
+                  <span class="ms-2">Light</span>
+                  <i class="fa-solid fa-check d-none"></i>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="dark" aria-pressed="true">
+                  <i class="fa-solid fa-moon" style="width:16px" data-icon="fa-solid fa-moon"></i>
+                  <span class="ms-2">Dark</span>
+                  <i class="fa-solid fa-check d-none"></i>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto" aria-pressed="false">
+                  <i class="fa-solid fa-circle-half-stroke" style="width:16px" data-icon="fa-solid fa-circle-half-stroke"></i>
+                  <span class="ms-2">Auto</span>
+                  <i class="fa-solid fa-check d-none"></i>
+                </button>
+              </li>
+            </ul>
+          </li>
+        </ul>
       </div>
-    </nav>
+
+      </nav>
+    </header>
     <div id="main">{{{content}}}</div>
   </body>
   {{{script}}}
   <script src="/dist/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/aux/theme-switcher.js"></script>
 </html>

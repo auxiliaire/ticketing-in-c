@@ -50,12 +50,12 @@ const SortHead = function (props) {
   return html`
     <thead>
       <tr>
-        <th scope="col"><a href="#" class="text-nowrap link-dark link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('id'); e.preventDefault(); }}>Id ${h(Caret, { id: 'id', sort, order })}</a></th>
-        <th scope="col"><a href="#" class="text-nowrap link-dark link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('title'); e.preventDefault(); }}>Title ${h(Caret, { id: 'title', sort, order })}</a></th>
-        <th scope="col"><a href="#" class="text-nowrap link-dark link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('description'); e.preventDefault(); }}>Description ${h(Caret, { id: 'description', sort, order })}</a></th>
-        <th scope="col"><a href="#" class="text-nowrap link-dark link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('created_at'); e.preventDefault(); }}>Created At ${h(Caret, { id: 'created_at', sort, order })}</a></th>
-        <th scope="col"><a href="#" class="text-nowrap link-dark link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('created_by'); e.preventDefault(); }}>Created By ${h(Caret, { id: 'created_by', sort, order })}</a></th>
-        <th scope="col"><a href="#" class="text-nowrap link-dark link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('score'); e.preventDefault(); }}>Score ${h(Caret, { id: 'score', sort, order })}</a></th>
+        <th scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('id'); e.preventDefault(); }}>Id ${h(Caret, { id: 'id', sort, order })}</a></th>
+        <th scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('title'); e.preventDefault(); }}>Title ${h(Caret, { id: 'title', sort, order })}</a></th>
+        <th scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('description'); e.preventDefault(); }}>Description ${h(Caret, { id: 'description', sort, order })}</a></th>
+        <th scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('created_at'); e.preventDefault(); }}>Created At ${h(Caret, { id: 'created_at', sort, order })}</a></th>
+        <th scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('created_by'); e.preventDefault(); }}>Created By ${h(Caret, { id: 'created_by', sort, order })}</a></th>
+        <th scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('score'); e.preventDefault(); }}>Score ${h(Caret, { id: 'score', sort, order })}</a></th>
         <th scope="col"><i class="fa-solid fa-wrench"></i></th>
       </tr>
     </thead>
@@ -179,13 +179,15 @@ const App = function (props) {
 
   return html`
   <div>
-    <nav class="bg-dark-subtle mb-3 ps-5" aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/" class="icon-link icon-link-hover" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);text-decoration:none;"><i class="bi fa-solid fa-house"></i> Home</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><i class="fa-solid fa-ticket"></i> Tickets</li>
-      </ol>
+    <nav class="bg-dark-subtle mb-3" aria-label="breadcrumb">
+      <div class="container-xxl">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/" class="icon-link icon-link-hover" style="--bs-icon-link-transform: translate3d(0, -.125rem, 0);text-decoration:none;"><i class="bi fa-solid fa-house"></i> Home</a></li>
+          <li class="breadcrumb-item active" aria-current="page"><i class="fa-solid fa-ticket"></i> Tickets</li>
+        </ol>
+      </div>
     </nav>
-    <div class="container mt-4">
+    <div class="container-xxl mt-4">
       <h3>Tickets</h3>
       <div class="container">
         ${h(Spinner, { isShown: () => state.tickets.length === 0})}
