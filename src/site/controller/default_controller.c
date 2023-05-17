@@ -8,7 +8,7 @@ void get_index_action(struct mg_connection *c, void *ev_data, application_contex
     LayoutModel layout_model = {
         .layout_filename = ctx->layout->str,
         .title = "Welcome",
-        .content = "<nav class=\"bg-dark-subtle mb-3 ps-5\" aria-label=\"breadcrumb\"><ol class=\"breadcrumb\"><li class=\"breadcrumb-item active\" aria-current=\"page\"><i class=\"bi fa-solid fa-house\"></i> Home</li><li class=\"breadcrumb-item\"><a href=\"/tickets\" class=\"icon-link icon-link-hover\" style=\"--bs-icon-link-transform: translate3d(0, -.125rem, 0);text-decoration:none;\"><i class=\"bi fa-solid fa-ticket\"></i> Tickets</a></li></ol></nav><div class=\"container\"><h3 class=\"mt-4\">Welcome to our Ticketing platform</h3><span class=\"badge text-bg-primary\">Written in C</span><div class=\"row mt-4\"><b>Current routes:</b><ul><li><a href=\"/tickets\">Tickets</a></li></ul></div></div>",
+        .content = "<nav class=\"bg-dark-subtle mb-3\" aria-label=\"breadcrumb\"><div class=\"container-xxl\"><ol class=\"breadcrumb\"><li class=\"breadcrumb-item active\" aria-current=\"page\"><i class=\"bi fa-solid fa-house\"></i> Home</li><li class=\"breadcrumb-item\"><a href=\"/tickets\" class=\"icon-link icon-link-hover\" style=\"--bs-icon-link-transform: translate3d(0, -.125rem, 0);text-decoration:none;\"><i class=\"bi fa-solid fa-ticket\"></i> Tickets</a></li></ol></div></nav><div class=\"container-xxl\"><h3 class=\"mt-4\">Welcome to our Ticketing platform</h3><span class=\"badge text-bg-primary\">Written in C</span><div class=\"row mt-4\"><b>Current routes:</b><ul><li><a href=\"/tickets\">Tickets</a></li></ul></div></div>",
         .script = "<!-- No scripts this time -->"
     };
 
