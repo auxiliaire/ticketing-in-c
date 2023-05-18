@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED on)
 
-project(ticketing VERSION 0.0.3)
+project(ticketing VERSION 0.1.2)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
@@ -10,6 +10,7 @@ pkg_check_modules(SQLITE REQUIRED sqlite3)
 pkg_check_modules(JSONC REQUIRED json-c)
 pkg_check_modules(LIBMUSTACH REQUIRED libmustach)
 pkg_check_modules(LIBMUSTACH_JSONC REQUIRED libmustach-json-c)
+pkg_check_modules(OPENSSL REQUIRED openssl)
 
 find_package(SQLite3)
 
@@ -18,6 +19,7 @@ include_directories(
     ${JSONC_INCLUDE_DIRS}
     ${LIBMUSTACH_INCLUDE_DIRS}
     ${LIBMUSTACH_JSONC_INCLUDE_DIRS}
+    ${OPENSSL_INCLUDE_DIRS}
 )
 link_directories(
     ${GLIB_LIBRARY_DIRS}
@@ -25,6 +27,7 @@ link_directories(
     ${JSONC_LIBRARY_DIRS}
     ${LIBMUSTACH_JSONC_LIBRARY_DIRS}
     ${LIBMUSTACH_JSONC_LIBRARY_DIRS}
+    ${OPENSSL_LIBRARIES}
 )
 
 file(GLOB SHARED_FILES src/site/render/*.c src/context.c src/data/*.c src/data/ticket/*.c)
@@ -52,6 +55,7 @@ target_compile_options(
     -W -Wall -Wextra -g
     -DMG_HTTP_DIRLIST_TIME_FMT="%Y/%m/%d %H:%M:%S"
     -DMG_ENABLE_LINES=1 -DMG_ENABLE_IPV6=1 -DMG_ENABLE_SSI=1
+    -DMG_ENABLE_OPENSSL=1 -lssl -lcrypto
 )
 target_include_directories(ticketing PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib
@@ -70,6 +74,7 @@ target_link_libraries(
     ${JSONC_LINK_LIBRARIES}
     ${LIBMUSTACH_LIBRARIES}
     ${LIBMUSTACH_JSONC_LINK_LIBRARIES}
+    ${OPENSSL_LIBRARIES}
 )
 
 target_include_directories(tickets-controller PUBLIC
@@ -84,6 +89,7 @@ target_link_libraries(
     ${JSONC_LINK_LIBRARIES}
     ${LIBMUSTACH_LIBRARIES}
     ${LIBMUSTACH_JSONC_LINK_LIBRARIES}
+    ${OPENSSL_LIBRARIES}
 )
 
 target_include_directories(default-controller PUBLIC
@@ -98,4 +104,5 @@ target_link_libraries(
     ${JSONC_LINK_LIBRARIES}
     ${LIBMUSTACH_LIBRARIES}
     ${LIBMUSTACH_JSONC_LINK_LIBRARIES}
+    ${OPENSSL_LIBRARIES}
 )
