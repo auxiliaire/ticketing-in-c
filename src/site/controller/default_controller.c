@@ -1,14 +1,32 @@
 #include "default_controller.h"
 
+#include <glib.h>
 #include "../render/layout.h"
+
+static void handle_error(GError*);
 
 void get_index_action(struct mg_connection *c, void *ev_data, application_context *ctx) {
     struct mg_http_message *hm = ev_data;
 
+    gchar *filename, *content;
+    unsigned long length;
+    GError *error = NULL;
+
+    g_info("Home dir: %s", g_get_home_dir());
+    filename = g_build_filename(g_get_current_dir(), "/view/main.html", NULL);
+
+    gboolean loaded = g_file_get_contents(filename, &content, &length, &error);
+    if (!loaded) {
+        handle_error(error);
+        GString *s = g_string_new("Could not load content");
+        content = s->str;
+        g_string_free(s, FALSE);
+    }
+
     LayoutModel layout_model = {
         .layout_filename = ctx->layout->str,
         .title = "Welcome",
-        .content = "<nav class=\"bg-dark-subtle mb-3\" aria-label=\"breadcrumb\"><div class=\"container-xxl\"><ol class=\"breadcrumb\"><li class=\"breadcrumb-item active\" aria-current=\"page\"><i class=\"bi fa-solid fa-house\"></i> Home</li><li class=\"breadcrumb-item\"><a href=\"/tickets\" class=\"icon-link icon-link-hover\" style=\"--bs-icon-link-transform: translate3d(0, -.125rem, 0);text-decoration:none;\"><i class=\"bi fa-solid fa-ticket\"></i> Tickets</a></li></ol></div></nav><div class=\"container-xxl\"><h3 class=\"mt-4\">Welcome to our Ticketing platform</h3><span class=\"badge text-bg-primary\">Written in C</span><div class=\"row mt-4\"><b>Current routes:</b><ul><li><a href=\"/tickets\">Tickets</a></li></ul></div></div>",
+        .content = content,
         .script = "<!-- No scripts this time -->"
     };
 
@@ -22,4 +40,12 @@ void get_index_action(struct mg_connection *c, void *ev_data, application_contex
         mg_http_serve_file(c, hm, "view/500.html", &opts);
     }
     g_string_free(render, TRUE);
+    g_free(content);
+}
+
+static void handle_error(GError *error) {
+    if (error != NULL) {
+        g_warning("File read error: %s", error->message);
+        g_clear_error(&error);
+    }
 }
