@@ -2,7 +2,7 @@
 
 #include "tickets.h"
 
-#define TICKETS_FETCH_ALL "SELECT * FROM tickets WHERE 1;"
+#define TICKETS_FETCH_ALL "SELECT t.id, t.title, t.description, t.created_at, u.username AS created_by, t.score FROM tickets t LEFT JOIN users u ON (t.created_by = u.id) WHERE 1;"
 #define TICKETS_FETCH_ONE "SELECT * FROM tickets WHERE id = ?;"
 #define TICKETS_INSERT_ONE "INSERT INTO tickets (id, title, description, created_at, created_by, score) VALUES (:i,:t,:d,:a,:b,:s) ON CONFLICT(id) DO UPDATE SET title=:t,description=:d,score=:s WHERE id=:i;"
 #define TICKETS_DELETE_ONE "DELETE FROM tickets WHERE id=:i LIMIT 1;"

@@ -89,7 +89,7 @@ const Tickets = function (props) {
         <td>${ticket.title}</td>
         <td>${ticket.description}</td>
         <td>${ticket.created_at}</td>
-        <td>${ticket.created_by}</td>
+        <td><span class="badge bg-secondary">${ticket.created_by}</span></td>
         <td>${ticket.score}</td>
         <td>
           <form id="tdf_${ticket.id}" method="post" action="/tickets/delete">
