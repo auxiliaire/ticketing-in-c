@@ -50,10 +50,10 @@ const SortHead = function (props) {
   return html`
     <thead>
       <tr>
-        <th scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('id'); e.preventDefault(); }}>Id ${h(Caret, { id: 'id', sort, order })}</a></th>
+        <th class="d-none d-md-table-cell" scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('id'); e.preventDefault(); }}>Id ${h(Caret, { id: 'id', sort, order })}</a></th>
         <th scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('title'); e.preventDefault(); }}>Title ${h(Caret, { id: 'title', sort, order })}</a></th>
-        <th scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('description'); e.preventDefault(); }}>Description ${h(Caret, { id: 'description', sort, order })}</a></th>
-        <th scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('created_at'); e.preventDefault(); }}>Created At ${h(Caret, { id: 'created_at', sort, order })}</a></th>
+        <th class="d-none d-xxl-table-cell" scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('description'); e.preventDefault(); }}>Description ${h(Caret, { id: 'description', sort, order })}</a></th>
+        <th class="d-none d-lg-table-cell" scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('created_at'); e.preventDefault(); }}>Created At ${h(Caret, { id: 'created_at', sort, order })}</a></th>
         <th scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('created_by'); e.preventDefault(); }}>Created By ${h(Caret, { id: 'created_by', sort, order })}</a></th>
         <th scope="col"><a href="#" class="text-nowrap link-body-emphasis link-underline-opacity-0 link-underline-opacity-75-hover" onclick=${(e) => { sortBy('score'); e.preventDefault(); }}>Score ${h(Caret, { id: 'score', sort, order })}</a></th>
         <th scope="col"><i class="fa-solid fa-wrench"></i></th>
@@ -80,34 +80,37 @@ const Tickets = function (props) {
     setTickets(props.tickets);
   }, [props.tickets]);
 
-  return html`<table class="table table-striped table-hover">
-    ${h(SortHead, { resort })}
-    <tbody>
-    ${tickets.map(ticket => html`
-      <tr key=${ticket.id}>
-        <th scope="row">${ticket.id}</th>
-        <td>${ticket.title}</td>
-        <td>${ticket.description}</td>
-        <td>${ticket.created_at}</td>
-        <td><span class="badge bg-secondary">${ticket.created_by}</span></td>
-        <td>${ticket.score}</td>
-        <td>
-          <form id="tdf_${ticket.id}" method="post" action="/tickets/delete">
-            <input type="hidden" name="id" value=${ticket.id} />
-            <div class="btn-toolbar" role="toolbar">
-              <div class="btn-group btn-group-sm me-1" role="group">
-                <a href="/tickets/${ticket.id}" type="button" class="col btn btn-outline-primary btn-sm"><i class="fa-solid fa-binoculars"></i></a>
+  return html`
+  <div class="table-responsive-md">
+    <table class="table table-striped table-hover">
+      ${h(SortHead, { resort })}
+      <tbody>
+      ${tickets.map(ticket => html`
+        <tr key=${ticket.id}>
+          <th class="d-none d-md-table-cell" scope="row">${ticket.id}</th>
+          <td>${ticket.title}</td>
+          <td class="d-none d-xxl-table-cell text-truncate" style="max-width: 400px">${ticket.description}</td>
+          <td class="d-none d-lg-table-cell">${ticket.created_at}</td>
+          <td><span class="badge bg-secondary">${ticket.created_by}</span></td>
+          <td>${ticket.score}</td>
+          <td>
+            <form id="tdf_${ticket.id}" method="post" action="/tickets/delete">
+              <input type="hidden" name="id" value=${ticket.id} />
+              <div class="btn-toolbar" role="toolbar">
+                <div class="btn-group btn-group-sm me-1 mt-1 mt-sm-0" role="group">
+                  <a href="/tickets/${ticket.id}" type="button" class="col btn btn-outline-primary btn-sm"><i class="fa-solid fa-binoculars"></i></a>
+                </div>
+                <div class="btn-group btn-group-sm mt-1 mt-sm-0" role="group">
+                  <button type="button" class="col btn btn-outline-danger btn-sm" onclick=${() => props.setCurrent(ticket)} data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="fa-solid fa-trash" style="width:14px"></i></button>
+                </div>
               </div>
-              <div class="btn-group btn-group-sm mt-1" role="group">
-                <button type="button" class="col btn btn-outline-danger btn-sm" onclick=${() => props.setCurrent(ticket)} data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="fa-solid fa-trash"></i></button>
-              </div>
-            </div>
-          </form>
-        </td>
-      </tr>
-    `)}
-    </tbody>
-    </table>`;
+            </form>
+          </td>
+        </tr>
+      `)}
+      </tbody>
+      </table>
+    </div>`;
 };
 
 const Modal = function (props) {
