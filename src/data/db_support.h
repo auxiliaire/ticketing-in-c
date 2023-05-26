@@ -9,6 +9,7 @@
 typedef void *(*allocator_fn)();
 typedef void (*setter_fn)(void *object, size_t index, void *value);
 
+void *fetch_as_object(sqlite3_stmt *ppStmt, allocator_fn allocator, setter_fn setter);
 GList *fetch_as_list(sqlite3_stmt *ppStmt, allocator_fn allocator, setter_fn setter);
 GString *fetch_as_json(sqlite3_stmt *ppStmt);
 // TODO: distinguish JSON object from JSON string

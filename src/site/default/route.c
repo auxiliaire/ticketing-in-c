@@ -65,6 +65,12 @@ bool default_route_try(struct mg_connection* c, void* ev_data, application_conte
                         ? g_string_append_len(controller, parts2[0].ptr, parts2[0].len)
                         : g_string_append(controller, "default");
         action = g_string_append(action, "index");
+        action_delegate = get_action_delegate(method, controller, action);
+        // Either controller/index or default/action:
+        if (action_delegate == NULL) {
+            g_string_printf(action, "%s", controller->str);
+            g_string_printf(controller, "%s", "default");
+        }
     } else {
 
         // unknown/unknown

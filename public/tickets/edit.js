@@ -67,4 +67,4 @@ const App = function (props) {
 `;
 };
 
-window.onload = () => render(h(App, { id: window.ticketId }), document.getElementById('main'));
+window.onload = () => render(h(App, { id: window.selectedId }), document.getElementById('main'));

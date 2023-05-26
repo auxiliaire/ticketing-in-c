@@ -1,12 +1,11 @@
 #include "tickets_controller.h"
 
 #include "../render/layout.h"
+#include "../render/script.h"
 #include "../../data/tickets.h"
-
-#define SCRIPT_TEMPALTE "<script type=\"module\" src=\"/tickets/%s\"></script>"
-#define ID_SCRIPT_TEMPLATE "<script type=\"application/javascript\">window.ticketId = '%s';</script><script type=\"module\" src=\"/tickets/%s\"></script>"
-
-void render_script_template(GString* render, const char* src, const char *id);
+#include "../../data/user/user.h"
+#include "../../aux/auth.h"
+#include "../../aux/content_negotiation.h"
 
 void post_index_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
 
@@ -75,11 +74,18 @@ error:
 }
 
 void get_index_html_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
-
-    struct mg_http_message *hm = ev_data;
+    struct mg_http_message *hm = (struct mg_http_message *) ev_data;
+    void *user = get_user(hm, ctx);
+    if (user == NULL) {
+        g_info("%s", "Unauthenticated user");
+        return mg_http_reply(c, 302, "/login", "");
+    } else {
+        g_info("User found: %s", ((User*)user)->username->str);
+        user_delete(user);
+    }
 
     GString *script = g_string_new("");
-    render_script_template(script, "index.js", NULL);
+    render_script_template(script, "/tickets/index.js", NULL);
     LayoutModel layout_model = {
         .layout_filename = ctx->layout->str,
         .title = "Tickets",
@@ -101,6 +107,16 @@ void get_index_html_action(struct mg_connection* c, void* ev_data, application_c
 }
 
 void get_index_json_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
+    struct mg_http_message *hm = (struct mg_http_message *) ev_data;
+    void *user = get_user(hm, ctx);
+    if (user == NULL) {
+        MG_INFO(("%s", "Unauthenticated user"));
+        return mg_http_reply(c, 403, "", "Denied\n");
+    } else {
+        MG_INFO(("User found: %s", ((User*)user)->username->str));
+        user_delete(user);
+    }
+
     GString *json = tickets_fetch_all(ctx->db);
     mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s\n", json->str);
     g_string_free(json, TRUE);
@@ -115,27 +131,12 @@ void get_index_action(struct mg_connection* c, void* ev_data, application_contex
     g_list_free(param);
     reset_url_matches(ctx);
 
-    struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-    struct mg_str *s = mg_http_get_header(hm, "Accept");
-    GRegex *regex = g_regex_new("\\*/\\*", 0, 0, NULL);
+    cn_switch_json_html(c, ev_data, ctx,
 
-    if (s == NULL) {
-        // No Accept header
-        get_index_html_action(c, ev_data, ctx);
+        get_index_json_action,
 
-    } else if (mg_match(*s, mg_str("#application/json#"), NULL)) {
-        // application/json
-        get_index_json_action(c, ev_data, ctx);
-
-    } else if (g_regex_match(regex, s->ptr, 0, NULL) || mg_match(*s, mg_str("#text/html#"), NULL)) {
-        // text/html, */*
-        get_index_html_action(c, ev_data, ctx);
-
-    } else {
-        // Reject
-        mg_http_reply(c, 406, "", "%s", "Not Acceptable\n");
-    }
-    g_regex_unref(regex);
+        get_index_html_action
+    );
 }
 
 void put_index_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
@@ -151,7 +152,7 @@ void get_new_action(struct mg_connection* c, void* ev_data, application_context*
     struct mg_http_message *hm = ev_data;
     GString *id = g_string_new("");
     GString *script = g_string_new("");
-    render_script_template(script, "create.js", NULL);
+    render_script_template(script, "/tickets/create.js", NULL);
     LayoutModel layout_model = {
         .layout_filename = ctx->layout->str,
         .title = "Create New Ticket",
@@ -174,7 +175,7 @@ void get_show_html_action(struct mg_connection* c, void* ev_data, application_co
     GList *param;
     for (param = ctx->url_matches; param != NULL; param = param->next) {
         MG_INFO(("\t\tparam: %s", param->data));
-        render_script_template(script, "show.js", (char*)param->data);
+        render_script_template(script, "/tickets/show.js", (char*)param->data);
     }
     g_list_free(param);
     reset_url_matches(ctx);
@@ -215,27 +216,13 @@ void get_show_json_action(struct mg_connection* c, void* ev_data, application_co
 }
 
 void get_show_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
-    struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-    struct mg_str *s = mg_http_get_header(hm, "Accept");
-    GRegex *regex = g_regex_new("\\*/\\*", 0, 0, NULL);
 
-    if (s == NULL) {
-        // No Accept header
-        get_index_html_action(c, ev_data, ctx);
+    cn_switch_json_html(c, ev_data, ctx,
 
-    } else if (mg_match(*s, mg_str("#application/json#"), NULL)) {
-        // application/json
-        get_show_json_action(c, ev_data, ctx);
+        get_show_json_action,
 
-    } else if (g_regex_match(regex, s->ptr, 0, NULL) || mg_match(*s, mg_str("#text/html#"), NULL)) {
-        // text/html, */*
-        get_show_html_action(c, ev_data, ctx);
-
-    } else {
-        // Reject
-        mg_http_reply(c, 406, "", "%s", "Not Acceptable\n");
-    }
-    g_regex_unref(regex);
+        get_show_html_action
+    );
 }
 
 void get_edit_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
@@ -249,7 +236,7 @@ void get_edit_action(struct mg_connection* c, void* ev_data, application_context
         for (param = ctx->url_matches; param != NULL; param = param->next) {
             MG_INFO(("\t\tparam: %s", param->data));
             g_string_printf(id, "%s", (gchar*)param->data);
-            render_script_template(script, "edit.js", (char*)param->data);
+            render_script_template(script, "/tickets/edit.js", (char*)param->data);
         }
         g_list_free(param);
         reset_url_matches(ctx);
@@ -261,7 +248,7 @@ void get_edit_action(struct mg_connection* c, void* ev_data, application_context
         res = mg_http_get_var(&hm->query, "id", buf, sizeof(buf));
         if (res > 0) {
             id = g_string_append_len(id, buf, res);
-            render_script_template(script, "edit.js", id->str);
+            render_script_template(script, "/tickets/edit.js", id->str);
         }
     }
     if (res <= 0) {
@@ -321,22 +308,4 @@ error:
 
 void delete_one_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
     mg_http_reply(c, 200, "Content-Type: text/html\r\n", "%s", "delete one");
-}
-
-void render_script_template(GString* render, const char* src, const char* id) {
-    if (id == NULL) {
-        g_string_printf(
-            render,
-            SCRIPT_TEMPALTE,
-            src
-        );
-    } else {
-        g_string_printf(
-            render,
-            ID_SCRIPT_TEMPLATE,
-            id,
-            src
-        );
-
-    }
 }

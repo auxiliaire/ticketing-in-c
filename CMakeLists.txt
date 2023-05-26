@@ -30,16 +30,20 @@ link_directories(
     ${OPENSSL_LIBRARIES}
 )
 
-file(GLOB SHARED_FILES src/site/render/*.c src/context.c src/data/*.c src/data/ticket/*.c)
+file(GLOB SHARED_FILES
+    src/aux/*c
+    src/context.c
+    src/data/*.c
+    src/data/ticket/*.c
+    src/data/user/*.c
+    src/site/render/*.c
+)
 file(GLOB_RECURSE LIB_FILES lib/*.c)
 add_library(tickets-controller MODULE ${CMAKE_CURRENT_SOURCE_DIR}/src/site/controller/tickets_controller.c ${LIB_FILES} ${SHARED_FILES})
 add_library(default-controller MODULE ${CMAKE_CURRENT_SOURCE_DIR}/src/site/controller/default_controller.c ${LIB_FILES} ${SHARED_FILES})
 
 file(GLOB SRC_FILES
     src/*.c
-    src/aux/*c
-    src/data/*.c
-    src/data/ticket/*.c
     src/site/*.c
     src/site/default/*.c
     src/static/*c
@@ -62,6 +66,7 @@ target_include_directories(ticketing PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/aux
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/ticket
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/data/user
     ${CMAKE_CURRENT_SOURCE_DIR}/src/site
     ${CMAKE_CURRENT_SOURCE_DIR}/src/site/default
     ${CMAKE_CURRENT_SOURCE_DIR}/src/site/render
@@ -79,8 +84,10 @@ target_link_libraries(
 
 target_include_directories(tickets-controller PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/aux
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/ticket
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/data/user
 )
 target_link_libraries(
     tickets-controller
@@ -94,8 +101,10 @@ target_link_libraries(
 
 target_include_directories(default-controller PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/aux
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/ticket
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/data/user
 )
 target_link_libraries(
     default-controller
