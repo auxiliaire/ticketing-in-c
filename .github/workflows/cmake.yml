@@ -38,6 +38,9 @@ jobs:
         repository: cesanta/mongoose
         path: ${{github.workspace}}/lib
     
+    - name: Clean Mongoose
+      run: cd ${{github.workspace}}/lib && rm -rf examples && rm -rf src && rm -rf test && rm LICENSE && rm Makefile && rm README.md
+    
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
