@@ -75,12 +75,12 @@ error:
 
 void get_index_html_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-    void *user = get_user(hm, ctx);
+    User *user = get_user(hm, ctx);
     if (user == NULL) {
-        g_info("%s", "Unauthenticated user");
-        return mg_http_reply(c, 302, "/login", "");
+        MG_INFO(("%s", "Unauthenticated user"));
+        return mg_http_reply(c, 302, "Location: /login\r\n", "");
     } else {
-        g_info("User found: %s", ((User*)user)->username->str);
+        MG_INFO(("User found: %s", ((User*)user)->username->str));
         user_delete(user);
     }
 

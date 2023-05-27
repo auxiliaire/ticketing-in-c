@@ -24,6 +24,6 @@ User *users_fetch_one(sqlite3 *db, GString *username) {
         return NULL;
     }
 
-    return (User*)fetch_as_object(ppStmt, user_new, user_set_value);
+    return fetch_as_object(ppStmt, user_new, user_set_value);
 }
 

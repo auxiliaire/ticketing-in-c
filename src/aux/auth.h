@@ -2,7 +2,8 @@
 #define TICKETING_AUX_AUTH_H
 
 #include "../context.h"
+#include "../data/users.h"
 
-void *get_user(struct mg_http_message *hm, application_context *ctx);
+User *get_user(struct mg_http_message *hm, application_context *ctx);
 
 #endif
