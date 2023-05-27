@@ -20,6 +20,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
+    - name: Install Jansson
+      run: sudo apt-get install libjansson4
+    
     - name: Checkout Mustach Repo
       uses: actions/checkout@v3
       with:
