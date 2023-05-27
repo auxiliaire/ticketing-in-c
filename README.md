@@ -4,6 +4,8 @@
 
 This is a web application written in C to demonstrate the enormous power and applicability of this venerable language.
 
+![Build](https://github.com/auxiliaire/ticketing-in-c/actions/workflows/CMake.yml/badge.svg)
+
 ## Requirements
 
 ### Backend
