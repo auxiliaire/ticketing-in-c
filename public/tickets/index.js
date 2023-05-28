@@ -91,7 +91,7 @@ const Tickets = function (props) {
           <td>${ticket.title}</td>
           <td class="d-none d-xxl-table-cell text-truncate" style="max-width: 400px">${ticket.description}</td>
           <td class="d-none d-lg-table-cell">${ticket.created_at}</td>
-          <td><span class="badge bg-secondary">${ticket.created_by}</span></td>
+          <td><span class="badge bg-secondary">${ticket.created_by ? ticket.created_by.username : 'N/A'}</span></td>
           <td>${ticket.score}</td>
           <td>
             <form id="tdf_${ticket.id}" method="post" action="/tickets/delete">
