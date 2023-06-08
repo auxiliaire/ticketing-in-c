@@ -36,6 +36,7 @@ static void signal_handler(int signo) {
 }
 
 static void http_dispatcher(struct mg_connection *c, int ev, void *ev_data, void *ctx) {
+#ifdef ENABLE_TLS
     if (ev == MG_EV_ACCEPT) {
         struct mg_tls_opts opts = {
             .cert = "cert.pem",
@@ -43,6 +44,7 @@ static void http_dispatcher(struct mg_connection *c, int ev, void *ev_data, void
         };
         mg_tls_init(c, &opts);
     }
+#endif
     if (ev == MG_EV_HTTP_MSG) {
         struct mg_http_message *hm = ev_data;
 

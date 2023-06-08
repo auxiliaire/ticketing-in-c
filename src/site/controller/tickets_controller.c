@@ -14,17 +14,19 @@ void post_index_action(struct mg_connection* c, void* ev_data, application_conte
     MG_INFO(("Body: '%.*s'", (int) hm->body.len, hm->body.ptr));
 
     char _id[16] = "";
-    char *id;
+    char *s_id;
+    int64_t id;
     bool new = false;
     int id_len = mg_http_get_var(&hm->body, "id", _id, sizeof(_id));
     if (id_len < 0) goto error;
     if (id_len == 0) {
         id_len = 1;
-        id = "0";
+        s_id = "0";
         new = true;
     } else {
-        id = _id;
+        s_id = _id;
     }
+    if (!g_ascii_string_to_signed(s_id, 10, 0, INT64_MAX, &id, NULL)) goto error;
 
     char title[255] = "";
     int title_len = mg_http_get_var(&hm->body, "title", title, sizeof(title));
@@ -38,13 +40,13 @@ void post_index_action(struct mg_connection* c, void* ev_data, application_conte
     int desc_len = mg_http_get_var(&hm->body, "description", desc, sizeof(desc));
     if (desc_len <= 0) goto error;
 
-    MG_INFO(("\tId: \t\t'%.*s'", id_len, id));
+    MG_INFO(("\tId: \t\t'%.*s' -> %d", id_len, s_id, id));
     MG_INFO(("\tTitle: \t\t'%.*s'", title_len, title));
     MG_INFO(("\tScore: \t\t'%.*s'", score_len, score));
     MG_INFO(("\tDescription: \t'%.*s'", desc_len, desc));
 
     Ticket *ticket = ticket_new();
-    ticket_set_id(ticket, mg_to64(mg_str_n(id, id_len)));
+    ticket_set_id(ticket, id);
     ticket_set_title(ticket, g_string_new_len(title, title_len));
     ticket_set_desctiption(ticket, g_string_new_len(desc, desc_len));
     ticket_set_score(ticket, g_strtod(score, NULL));
@@ -59,7 +61,7 @@ void post_index_action(struct mg_connection* c, void* ev_data, application_conte
 
     GString *location = g_string_new("Location: /tickets/");
     if (!new)
-        g_string_append_printf(location, "%.*s", id_len, id);
+        g_string_append_printf(location, "%.*s", id_len, s_id);
     g_string_append(location, "\r\n");
 
     reset_url_matches(ctx);
@@ -203,16 +205,22 @@ void get_show_html_action(struct mg_connection* c, void* ev_data, application_co
 void get_show_json_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
     GList *param;
     int64_t id;
+    gboolean result;
+    GError *error = NULL;
     for (param = ctx->url_matches; param != NULL; param = param->next) {
-        MG_INFO(("\t\tparam: %s", param->data));
-        id = mg_to64(mg_str((char*)param->data));
+        result = g_ascii_string_to_signed((char*)(param->data), 10, 1, INT64_MAX, &id, &error);
     }
     g_list_free(param);
     reset_url_matches(ctx);
 
-    GString *json = tickets_fetch_one(ctx->db, id);
-    mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s\n", json->str);
-    g_string_free(json, TRUE);
+    if (result) {
+        GString *json = tickets_fetch_one(ctx->db, id);
+        mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s\n", json->str);
+        g_string_free(json, TRUE);
+    } else {
+        mg_http_reply(c, 400, "Content-Type: application/json\r\n", "{\"code\":%d,\"message\":\"%s\"}\n", error->code, error->message);
+        g_error_free(error);
+    }
 }
 
 void get_show_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
@@ -287,13 +295,15 @@ void post_delete_action(struct mg_connection* c, void* ev_data, application_cont
 
     MG_INFO(("Body: '%.*s'", (int) hm->body.len, hm->body.ptr));
 
-    char id[16] = "";
-    int id_len = mg_http_get_var(&hm->body, "id", id, sizeof(id));
+    char s_id[16] = "";
+    int id_len = mg_http_get_var(&hm->body, "id", s_id, sizeof(s_id));
     if (id_len <= 0) goto error;
+    int64_t id;
+    if (!g_ascii_string_to_signed(s_id, 10, 1, INT64_MAX, &id, NULL)) goto error;
 
-    MG_INFO(("\tId: \t\t'%.*s'", id_len, id));
+    MG_INFO(("\tId: \t\t'%.*s' -> %d", id_len, s_id, id));
 
-    int res = tickets_delete_one(ctx->db, mg_to64(mg_str_n(id, id_len)));
+    int res = tickets_delete_one(ctx->db, id);
 
     MG_INFO(("\t%d deleted", res));
 
