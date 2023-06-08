@@ -93,7 +93,7 @@ bool default_route_try(struct mg_connection* c, void* ev_data, application_conte
     g_string_free(controller, TRUE);
     g_string_free(action, TRUE);
     if (id->len == 0) {
-        MG_INFO(("\t(freeing id of len %d)", id->len));
+        MG_DEBUG(("\t(freeing id of len %d)", id->len));
         g_string_free(id, TRUE);
     }
 

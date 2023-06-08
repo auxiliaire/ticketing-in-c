@@ -35,6 +35,7 @@ link_directories(
 
 file(GLOB SHARED_FILES
     src/aux/*c
+    src/aux/middleware/*c
     src/context.c
     src/data/*.c
     src/data/ticket/*.c
@@ -67,6 +68,7 @@ target_compile_options(
 target_include_directories(ticketing PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib
     ${CMAKE_CURRENT_SOURCE_DIR}/src/aux
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/aux/middleware
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/ticket
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/user
@@ -88,6 +90,7 @@ target_link_libraries(
 target_include_directories(tickets-controller PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib
     ${CMAKE_CURRENT_SOURCE_DIR}/src/aux
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/aux/middleware
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/ticket
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/user
@@ -105,6 +108,7 @@ target_link_libraries(
 target_include_directories(default-controller PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib
     ${CMAKE_CURRENT_SOURCE_DIR}/src/aux
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/aux/middleware
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/ticket
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/user

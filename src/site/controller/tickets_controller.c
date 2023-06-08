@@ -4,12 +4,13 @@
 #include "../render/script.h"
 #include "../../data/tickets.h"
 #include "../../data/user/user.h"
-#include "../../aux/auth.h"
 #include "../../aux/content_negotiation.h"
+#include "../../aux/middleware/auth.h"
 
 void post_index_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
-
     struct mg_http_message *hm = ev_data;
+
+    if (guard_auth_html(c, hm, ctx)) return;
 
     MG_INFO(("Body: '%.*s'", (int) hm->body.len, hm->body.ptr));
 
@@ -77,14 +78,8 @@ error:
 
 void get_index_html_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-    User *user = get_user(hm, ctx);
-    if (user == NULL) {
-        MG_INFO(("%s", "Unauthenticated user"));
-        return mg_http_reply(c, 302, "Location: /login\r\n", "");
-    } else {
-        MG_INFO(("User found: %s", ((User*)user)->username->str));
-        user_delete(user);
-    }
+
+    if (guard_auth_html(c, hm, ctx)) return;
 
     GString *script = g_string_new("");
     render_script_template(script, "/tickets/index.js", NULL);
@@ -110,14 +105,8 @@ void get_index_html_action(struct mg_connection* c, void* ev_data, application_c
 
 void get_index_json_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-    void *user = get_user(hm, ctx);
-    if (user == NULL) {
-        MG_INFO(("%s", "Unauthenticated user"));
-        return mg_http_reply(c, 403, "", "Denied\n");
-    } else {
-        MG_INFO(("User found: %s", ((User*)user)->username->str));
-        user_delete(user);
-    }
+
+    if (guard_auth_json(c, hm, ctx)) return;
 
     GString *json = tickets_fetch_all(ctx->db);
     mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s\n", json->str);
@@ -152,6 +141,9 @@ void delete_index_action(struct mg_connection* c, void* ev_data, application_con
 
 void get_new_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
     struct mg_http_message *hm = ev_data;
+
+    if (guard_auth_html(c, hm, ctx)) return;
+
     GString *id = g_string_new("");
     GString *script = g_string_new("");
     render_script_template(script, "/tickets/create.js", NULL);
@@ -170,8 +162,9 @@ void get_new_action(struct mg_connection* c, void* ev_data, application_context*
 }
 
 void get_show_html_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
-
     struct mg_http_message *hm = ev_data;
+
+    if (guard_auth_html(c, hm, ctx)) return;
 
     GString *script = g_string_new("");
     GList *param;
@@ -203,6 +196,10 @@ void get_show_html_action(struct mg_connection* c, void* ev_data, application_co
 }
 
 void get_show_json_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
+    struct mg_http_message *hm = ev_data;
+
+    if (guard_auth_json(c, hm, ctx)) return;
+
     GList *param;
     int64_t id;
     gboolean result;
@@ -235,6 +232,9 @@ void get_show_action(struct mg_connection* c, void* ev_data, application_context
 
 void get_edit_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
     struct mg_http_message *hm = ev_data;
+
+    if (guard_auth_html(c, hm, ctx)) return;
+
     int res;
     GString *id = g_string_new("");
     GString *script = g_string_new("");
@@ -290,8 +290,9 @@ void post_update_action(struct mg_connection* c, void* ev_data, application_cont
 }
 
 void post_delete_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
-
     struct mg_http_message *hm = ev_data;
+
+    if (guard_auth_html(c, hm, ctx)) return;
 
     MG_INFO(("Body: '%.*s'", (int) hm->body.len, hm->body.ptr));
 
