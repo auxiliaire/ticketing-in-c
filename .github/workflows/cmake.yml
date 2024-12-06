@@ -39,7 +39,7 @@ jobs:
         path: ${{github.workspace}}/lib
     
     - name: Clean Mongoose
-      run: cd ${{github.workspace}}/lib && rm -rf examples && rm -rf src && rm -rf test && rm LICENSE && rm Makefile && rm README.md
+      run: cd ${{github.workspace}}/lib && rm -rf .github && rm -rf examples && rm -rf reference-projects && rm -rf src && rm -rf test && rm -rf tutorials && rm .clang-format && rm LICENSE && rm README.md
     
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
