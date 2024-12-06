@@ -7,8 +7,8 @@ RUN apt install libglib2.0-0 -y
 RUN apt install libjson-c5
 RUN apt install libjansson4
 WORKDIR /opt
-COPY ["./build/mustach-1.2.5/", "./mustach-1.2.5/"]
-WORKDIR /opt/mustach-1.2.5
+COPY ["./build/mustach-latest/", "./mustach-latest/"]
+WORKDIR /opt/mustach-latest
 RUN make install
 WORKDIR /app
 COPY ["./build/lib*.so", "./build/"]

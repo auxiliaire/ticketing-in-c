@@ -17,9 +17,9 @@ bool default_route_try(struct mg_connection* c, void* ev_data, application_conte
     struct mg_str parts4[4];
     struct mg_str parts3[3];
     struct mg_str parts2[2];
-    GString *guri = g_string_new_len(hm->uri.ptr, hm->uri.len);
-    struct mg_str uri = mg_str_n(hm->uri.ptr, hm->uri.len);
-    GString *method = g_string_new_len(hm->method.ptr, hm->method.len);
+    GString *guri = g_string_new_len(hm->uri.buf, hm->uri.len);
+    struct mg_str uri = mg_str_n(hm->uri.buf, hm->uri.len);
+    GString *method = g_string_new_len(hm->method.buf, hm->method.len);
     GString *controller = g_string_new("");
     GString *action = g_string_new("");
     GString *id = g_string_new("");
@@ -33,23 +33,23 @@ bool default_route_try(struct mg_connection* c, void* ev_data, application_conte
 
         // Controller/Action/Id
         controller = parts4[0].len > 0
-                        ? g_string_append_len(controller, parts4[0].ptr, parts4[0].len)
+                        ? g_string_append_len(controller, parts4[0].buf, parts4[0].len)
                         : g_string_append(controller, "default");
         action = parts4[1].len > 0
-                        ? g_string_append_len(action, parts4[1].ptr, parts4[1].len)
+                        ? g_string_append_len(action, parts4[1].buf, parts4[1].len)
                         : g_string_append(action, "index");
         id = parts4[2].len > 0
-                        ? g_string_append_len(id, parts4[2].ptr, parts4[2].len)
+                        ? g_string_append_len(id, parts4[2].buf, parts4[2].len)
                         : id;
         set_param(id, ctx);
     } else if (mg_match(uri, mg_str("/*/*"), parts3)) {
 
         // Controller/Action|Id
         controller = parts3[0].len > 0
-                        ? g_string_append_len(controller, parts3[0].ptr, parts3[0].len)
+                        ? g_string_append_len(controller, parts3[0].buf, parts3[0].len)
                         : g_string_append(controller, "default");
         action = parts3[1].len > 0
-                        ? g_string_append_len(action, parts3[1].ptr, parts3[1].len)
+                        ? g_string_append_len(action, parts3[1].buf, parts3[1].len)
                         : g_string_append(action, "index");
         action_delegate = get_action_delegate(method, controller, action);
         // Either action or id:
@@ -62,7 +62,7 @@ bool default_route_try(struct mg_connection* c, void* ev_data, application_conte
 
         // Controller/index
         controller = parts2[0].len > 0
-                        ? g_string_append_len(controller, parts2[0].ptr, parts2[0].len)
+                        ? g_string_append_len(controller, parts2[0].buf, parts2[0].len)
                         : g_string_append(controller, "default");
         action = g_string_append(action, "index");
         action_delegate = get_action_delegate(method, controller, action);

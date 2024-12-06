@@ -35,7 +35,7 @@ static void signal_handler(int signo) {
     s_signo = signo;
 }
 
-static void http_dispatcher(struct mg_connection *c, int ev, void *ev_data, void *ctx) {
+static void http_dispatcher(struct mg_connection *c, int ev, void *ev_data) {
 #ifdef ENABLE_TLS
     if (ev == MG_EV_ACCEPT) {
         struct mg_tls_opts opts = {
@@ -49,11 +49,11 @@ static void http_dispatcher(struct mg_connection *c, int ev, void *ev_data, void
         struct mg_http_message *hm = ev_data;
 
         // TODO: refactor this if to a loop
-        if (static_route_try(c, ev_data, ctx)) {
+        if (static_route_try(c, ev_data, c->fn_data)) {
             /* STATIC */
             return;
 
-        } else if (default_route_try(c, ev_data, ctx)) {
+        } else if (default_route_try(c, ev_data, c->fn_data)) {
             /* DEFAULT ROUTE */
             return;
 

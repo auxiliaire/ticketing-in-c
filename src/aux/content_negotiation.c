@@ -13,7 +13,7 @@ void cn_switch_json_html(struct mg_connection* c, void* ev_data, application_con
         // application/json
         json_method(c, ev_data, ctx);
 
-    } else if (g_regex_match(regex, s->ptr, 0, NULL) || mg_match(*s, mg_str("#text/html#"), NULL)) {
+    } else if (g_regex_match(regex, s->buf, 0, NULL) || mg_match(*s, mg_str("#text/html#"), NULL)) {
         // text/html, */*
         html_method(c, ev_data, ctx);
 

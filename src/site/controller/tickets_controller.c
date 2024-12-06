@@ -12,7 +12,7 @@ void post_index_action(struct mg_connection* c, void* ev_data, application_conte
 
     if (guard_auth_html(c, hm, ctx)) return;
 
-    MG_INFO(("Body: '%.*s'", (int) hm->body.len, hm->body.ptr));
+    MG_INFO(("Body: '%.*s'", (int) hm->body.len, hm->body.buf));
 
     char _id[16] = "";
     char *s_id;
@@ -294,7 +294,7 @@ void post_delete_action(struct mg_connection* c, void* ev_data, application_cont
 
     if (guard_auth_html(c, hm, ctx)) return;
 
-    MG_INFO(("Body: '%.*s'", (int) hm->body.len, hm->body.ptr));
+    MG_INFO(("Body: '%.*s'", (int) hm->body.len, hm->body.buf));
 
     char s_id[16] = "";
     int id_len = mg_http_get_var(&hm->body, "id", s_id, sizeof(s_id));
