@@ -1,4 +1,5 @@
-// Copyright (c) 2020 Cesanta Software Limited
+// Copyright (c) 2023 Viktor Daróczi
+// Based on the example from Cesanta Software Limited (c) 2020
 // All rights reserved
 
 #include <signal.h>

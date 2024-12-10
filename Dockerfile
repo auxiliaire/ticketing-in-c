@@ -1,11 +1,13 @@
 FROM ubuntu:22.04
-RUN apt update
-RUN apt upgrade -y
-RUN apt install make
-RUN apt install libsqlite3-0
-RUN apt install libglib2.0-0 -y
-RUN apt install libjson-c5
-RUN apt install libjansson4
+RUN apt-get update
+RUN apt-get upgrade -y
+RUN apt-get install apt-utils
+RUN apt-get install make
+RUN apt-get install pkg-config -y
+RUN apt-get install libsqlite3-0
+RUN apt-get install libglib2.0-0 -y
+RUN apt-get install libjson-c5
+RUN apt-get install libjansson4
 WORKDIR /opt
 COPY ["./build/mustach-latest/", "./mustach-latest/"]
 WORKDIR /opt/mustach-latest

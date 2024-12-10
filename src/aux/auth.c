@@ -11,11 +11,13 @@ User *get_user(struct mg_http_message *hm, application_context *ctx) {
         GString *username = g_string_new(user);
         MG_INFO(("user / pass: '%s' / ***", user));
         u = users_fetch_one(ctx->db, username);
-        g_string_free(username, TRUE);
-        if (strcmp(pass, u->password->str) != 0) {
+        if (u == NULL) {
+            MG_INFO((" \\ user could not be retrieved"));
+        } else if (strcmp(pass, u->password->str) != 0) {
             user_delete(u);
             u = NULL;
         }
+        g_string_free(username, TRUE);
     } else if (user[0] == '\0') {
         // Only password is set, search by token
         GString *token = g_string_new(pass);

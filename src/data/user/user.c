@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "user.h"
 
 void *user_new() {
@@ -12,16 +14,30 @@ void *user_new() {
 }
 
 void user_delete(User* user) {
-    g_string_free(user->public_id, TRUE);
-    user->public_id = NULL;
-    g_string_free(user->username, TRUE);
-    user->username = NULL;
-    g_string_free(user->password, TRUE);
-    user->password = NULL;
-    g_string_free(user->token, TRUE);
-    user->token = NULL;
-    g_string_free(user->token_expiry, TRUE);
-    user->token_expiry = NULL;
+    if (user == NULL) {
+        fprintf(stderr, "Possible double free attempt @user_delete\n");
+        return;
+    }
+    if (user->public_id != NULL) {
+        g_string_free(user->public_id, TRUE);
+        user->public_id = NULL;
+    }
+    if (user->username != NULL) {
+        g_string_free(user->username, TRUE);
+        user->username = NULL;
+    }
+    if (user->password != NULL) {
+        g_string_free(user->password, TRUE);
+        user->password = NULL;
+    }
+    if (user->token != NULL) {
+        g_string_free(user->token, TRUE);
+        user->token = NULL;
+    }
+    if (user->token_expiry != NULL) {
+        g_string_free(user->token_expiry, TRUE);
+        user->token_expiry = NULL;
+    }
     g_free(user);
 }
 

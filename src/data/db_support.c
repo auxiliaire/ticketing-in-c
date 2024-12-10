@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "db_support.h"
 
 void *_fetch_as_object(sqlite3_stmt *ppStmt, int ncols, allocator_fn allocator, setter_fn setter);
@@ -8,6 +10,8 @@ void *fetch_as_object(sqlite3_stmt *ppStmt, allocator_fn allocator, setter_fn se
     void *object = NULL;
     if (rc == SQLITE_ROW) {
         object = _fetch_as_object(ppStmt, ncols, allocator, setter);
+    } else {
+        fprintf(stderr, "SQLite returned code %d\n", rc);
     }
     sqlite3_finalize(ppStmt);
     return object;
