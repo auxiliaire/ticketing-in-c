@@ -107,8 +107,15 @@ int main(int argc, char *argv[]) {
     // Root directory must not contain double dots. Make it absolute
     // Do the conversion only if the root dir spec does not contain overrides
     if (strchr(s_root_dir, ',') == NULL) {
-        realpath(s_root_dir, path);
-        s_root_dir = path;
+        char *res = realpath(s_root_dir, path);
+        if (res != NULL) {
+            s_root_dir = path;
+        } else {
+            char* errStr = strerror(errno);
+            printf("Can't resolve root dir: %s\n", errStr);
+            perror("realpath");
+            exit(EXIT_FAILURE);
+        }
     }
 
     // Initialize stuff
