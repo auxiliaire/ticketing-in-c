@@ -2,8 +2,8 @@
 
 #include <dlfcn.h>
 
-void log_key(gpointer key, gpointer value, gpointer user_data);
-void *get_handle(gchar *library_key);
+void log_key(gpointer key);
+void* get_handle(gchar* library_key);
 GHashTable *get_action_table();
 GHashTable *get_handle_table();
 ActionDelegate get_action_delegate(GString *method, GString *controller, GString *action);
@@ -29,15 +29,13 @@ ActionDelegate get_action_delegate(GString *method, GString *controller, GString
     g_string_printf(library_key, "./build/lib%s-controller.so", controller->str);
     g_debug("\t\t - library '%s'", library_key->str);
 
-    void *handle = get_handle(library_key->str);
+    void *handle = get_handle(g_string_free_and_steal(library_key));
     if (!handle) {
         g_debug("\t\t ...not found");
-        g_string_free(library_key, FALSE);
         g_string_free(action_key, TRUE);
         goto exitwithcleanup;
     } else {
         g_debug("\t\t ...found");
-        g_string_free(library_key, FALSE);
     }
 
     action_delegate = dlsym(handle, action_name->str);
@@ -49,9 +47,7 @@ ActionDelegate get_action_delegate(GString *method, GString *controller, GString
         g_debug("\t\t - action '%s' loaded successfully", action_key->str);
     }
 
-    g_hash_table_insert(get_action_table(), action_key->str, action_delegate);
-
-    g_string_free(action_key, FALSE);
+    g_hash_table_insert(get_action_table(), g_string_free_and_steal(action_key), action_delegate);
 
     goto exitwithcleanup;
 
@@ -67,11 +63,7 @@ void *get_handle(gchar *library_key) {
         handle = dlopen(library_key, RTLD_LAZY);
         if (handle) {
             g_hash_table_insert(get_handle_table(), library_key, handle);
-        } else {
-            g_free(library_key);
         }
-    } else {
-        g_free(library_key);
     }
     return handle;
 }
@@ -101,7 +93,7 @@ GHashTable *get_action_table() {
     return action_table;
 }
 
-void log_key(gpointer key, gpointer value, gpointer user_data) {
+void log_key(gpointer key) {
     MG_DEBUG(("\t\t\t - '%s'", (gchar *)key));
 }
 

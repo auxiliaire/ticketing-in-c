@@ -1,7 +1,7 @@
 #include "context.h"
 
 void string_free(void *p) {
-    g_string_free((GString*)p, FALSE);
+    free(p);
 }
 
 void reset_url_matches(application_context *ctx) {

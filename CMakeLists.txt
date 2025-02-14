@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED on)
 
 project(ticketing VERSION 0.1.2)
@@ -60,10 +60,15 @@ add_executable(
 )
 target_compile_options(
     ticketing PUBLIC
-    -W -Wall -Wextra -g
+    -W -Wall -Wextra -Wpedantic
+    -fsanitize=address -fno-omit-frame-pointer -O3
     -DMG_HTTP_DIRLIST_TIME_FMT="%Y/%m/%d %H:%M:%S"
     -DMG_ENABLE_LINES=1 -DMG_ENABLE_IPV6=1 -DMG_ENABLE_SSI=1
     -DMG_ENABLE_OPENSSL=1 -lssl -lcrypto
+)
+target_link_options(
+    ticketing PUBLIC
+    -fsanitize=address
 )
 target_include_directories(ticketing PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib

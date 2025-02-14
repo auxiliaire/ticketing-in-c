@@ -23,8 +23,7 @@ void get_index_action(struct mg_connection *c, void *ev_data, application_contex
     if (!loaded) {
         handle_error(error);
         GString *s = g_string_new("Could not load content");
-        content = s->str;
-        g_string_free(s, FALSE);
+        content = g_string_free_and_steal(s);
     }
 
     LayoutModel layout_model = {

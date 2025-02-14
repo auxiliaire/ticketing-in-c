@@ -27,7 +27,7 @@ bool default_route_try(struct mg_connection* c, void* ev_data, application_conte
     ActionDelegate action_delegate = NULL;
     bool exitcode = false;
 
-    MG_INFO(("Trying URI: '%s'", guri->str));
+    MG_INFO(("Trying URI: '%s'", g_string_free_and_steal(guri)));
 
     if (mg_match(uri, mg_str("/*/*/*"), parts4)) {
 
@@ -108,8 +108,7 @@ void set_param(GString* value, application_context* ctx) {
 void add_param(GString* value, application_context* ctx) {
     GString *item = g_string_new("");
     item = g_string_append(item, value->str);
-    ctx->url_matches = g_list_append(ctx->url_matches, item->str);
-    g_string_free(item, FALSE);
+    ctx->url_matches = g_list_append(ctx->url_matches, g_string_free_and_steal(item));
 }
 
 gchar *get_parameterized_action(const GString* method) {

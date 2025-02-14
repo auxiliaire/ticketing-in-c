@@ -6,6 +6,7 @@
 #include "../../data/user/user.h"
 #include "../../aux/content_negotiation.h"
 #include "../../aux/middleware/auth.h"
+#include <limits.h>
 
 void post_index_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
     struct mg_http_message *hm = ev_data;
@@ -115,7 +116,7 @@ void get_index_json_action(struct mg_connection* c, void* ev_data, application_c
 
 void get_index_action(struct mg_connection* c, void* ev_data, application_context* ctx) {
     GList *param;
-    for (param = ctx->url_matches; param != NULL; param = param->next) {
+    for (param = ctx->url_matches; param != NULL;) {
         MG_INFO(("\t\tparam: %s", param->data));
         return get_show_action(c, ev_data, ctx);
     }
@@ -172,7 +173,6 @@ void get_show_html_action(struct mg_connection* c, void* ev_data, application_co
         MG_INFO(("\t\tparam: %s", param->data));
         render_script_template(script, "/tickets/show.js", (char*)param->data);
     }
-    g_list_free(param);
     reset_url_matches(ctx);
 
     LayoutModel layout_model = {
@@ -235,7 +235,7 @@ void get_edit_action(struct mg_connection* c, void* ev_data, application_context
 
     if (guard_auth_html(c, hm, ctx)) return;
 
-    int res;
+    int res = INT_MIN;
     GString *id = g_string_new("");
     GString *script = g_string_new("");
     if (ctx->url_matches != NULL) {
@@ -244,6 +244,7 @@ void get_edit_action(struct mg_connection* c, void* ev_data, application_context
         for (param = ctx->url_matches; param != NULL; param = param->next) {
             MG_INFO(("\t\tparam: %s", param->data));
             g_string_printf(id, "%s", (gchar*)param->data);
+            res = atoi(id->str);
             render_script_template(script, "/tickets/edit.js", (char*)param->data);
         }
         g_list_free(param);
@@ -260,7 +261,7 @@ void get_edit_action(struct mg_connection* c, void* ev_data, application_context
         }
     }
     if (res <= 0) {
-        MG_ERROR(("Error decoding var 'id': %d", res));
+        MG_ERROR(("Error decoding var 'id': %i", res));
         struct mg_http_serve_opts opts = {0};
         opts.root_dir = ".";
         opts.ssi_pattern = "#.shtml";
