@@ -44,7 +44,6 @@ void user_delete(User* user) {
 void user_set_value(void *object, size_t index, void *value) {
     User *user = (User*) object;
     int64_t *i;
-    double *d;
     switch (index) {
         case USER_ID:
             i = value;
