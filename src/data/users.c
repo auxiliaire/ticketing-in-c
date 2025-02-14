@@ -9,18 +9,16 @@ User *users_fetch_one(sqlite3 *db, GString *username) {
     int rc = sqlite3_prepare_v2(db, USERS_FETCH_ONE, -1, &ppStmt, NULL);
 
     if (rc != SQLITE_OK) {
-        char *zErrMsg = 0;
+        const char *zErrMsg = sqlite3_errstr(rc);
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
-        sqlite3_free(zErrMsg);
         return NULL;
     }
 
     rc = sqlite3_bind_text(ppStmt, 1, username->str, username->len, NULL);
 
     if (rc != SQLITE_OK) {
-        char *zErrMsg = 0;
+        const char *zErrMsg = sqlite3_errstr(rc);
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
-        sqlite3_free(zErrMsg);
         return NULL;
     }
 
