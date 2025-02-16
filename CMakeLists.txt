@@ -60,16 +60,23 @@ add_executable(
 )
 target_compile_options(
     ticketing PUBLIC
-    -W -Wall -Wextra -Wpedantic
-    -fsanitize=address -fno-omit-frame-pointer -O3
+    -W -Wall -Wextra -Wpedantic -O3
     -DMG_HTTP_DIRLIST_TIME_FMT="%Y/%m/%d %H:%M:%S"
     -DMG_ENABLE_LINES=1 -DMG_ENABLE_IPV6=1 -DMG_ENABLE_SSI=1
     -DMG_ENABLE_OPENSSL=1 -lssl -lcrypto
 )
-target_link_options(
-    ticketing PUBLIC
-    -fsanitize=address
-)
+
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+    set(
+        CMAKE_C_FLAGS
+        "${CMAKE_C_FLAGS} -fsanitize=undefined -fsanitize=address -fno-omit-frame-pointer"
+    )
+    target_link_options(
+        ticketing
+        BEFORE PUBLIC -fsanitize=undefined PUBLIC -fsanitize=address
+    )
+endif()
+
 target_include_directories(ticketing PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/lib
     ${CMAKE_CURRENT_SOURCE_DIR}/src/aux
@@ -100,11 +107,6 @@ target_include_directories(tickets-controller PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/ticket
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/user
 )
-target_compile_options(
-    tickets-controller PUBLIC
-    -W -Wall -Wextra -Wpedantic
-    -fsanitize=address -fno-omit-frame-pointer -O3
-)
 target_link_libraries(
     tickets-controller
     ${SQLite3_LIBRARIES}
@@ -122,11 +124,6 @@ target_include_directories(default-controller PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/ticket
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/user
-)
-target_compile_options(
-    default-controller PUBLIC
-    -W -Wall -Wextra -Wpedantic
-    -fsanitize=address -fno-omit-frame-pointer -O3
 )
 target_link_libraries(
     default-controller
