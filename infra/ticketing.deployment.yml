@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticketing
+  labels:
+    app: ticketing
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ticketing
+  template:
+    metadata:
+      labels:
+        app: ticketing
+    spec:
+      containers:
+      - name: ticketing
+        image: viktordaroczi/ticketing-raw:latest
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 15
+          timeoutSeconds: 2
+          periodSeconds: 5
+          failureThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 3
+          periodSeconds: 5
+          failureThreshold: 1
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"

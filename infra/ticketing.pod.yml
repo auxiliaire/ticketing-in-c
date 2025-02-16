@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ticketing-raw
+  labels:
+    app: ticketing-raw
+    rel: stable
+spec:
+  containers:
+  - name: ticketing-raw
+    image: viktordaroczi/ticketing-raw:latest
+    ports:
+    - containerPort: 8000
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 8000
+      initialDelaySeconds: 15
+      timeoutSeconds: 2
+      periodSeconds: 5
+      failureThreshold: 1
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 8000
+      initialDelaySeconds: 3
+      periodSeconds: 5
+      failureThreshold: 1
+    resources:
