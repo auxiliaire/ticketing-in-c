@@ -43,11 +43,12 @@ void user_delete(User* user) {
 
 void user_set_value(void *object, size_t index, void *value) {
     User *user = (User*) object;
-    int64_t *i;
+    int *i;
     switch (index) {
         case USER_ID:
             i = value;
             user->id = *i;
+            free(i);
             break;
         case PUBLIC_ID:
             user->public_id = (GString*) value;
@@ -67,7 +68,7 @@ void user_set_value(void *object, size_t index, void *value) {
     }
 }
 
-int64_t user_get_id(User *user) {
+int user_get_id(User *user) {
     return user->id;
 }
 
@@ -91,7 +92,7 @@ GString *user_get_token_expiry(User *user) {
     return user->token_expiry;
 }
 
-void user_set_id(User *user, int64_t id) {
+void user_set_id(User *user, int id) {
     user_set_value(user, USER_ID, (void*)&id);
 }
 

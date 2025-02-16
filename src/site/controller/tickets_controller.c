@@ -18,13 +18,13 @@ void post_index_action(struct mg_connection* c, void* ev_data, application_conte
     char _id[16] = "";
     char *s_id;
     int64_t id;
-    bool new = false;
+    bool new = FALSE;
     int id_len = mg_http_get_var(&hm->body, "id", _id, sizeof(_id));
     if (id_len < 0) goto error;
     if (id_len == 0) {
         id_len = 1;
         s_id = "0";
-        new = true;
+        new = TRUE;
     } else {
         s_id = _id;
     }
@@ -53,7 +53,9 @@ void post_index_action(struct mg_connection* c, void* ev_data, application_conte
     ticket_set_desctiption(ticket, g_string_new_len(desc, desc_len));
     ticket_set_score(ticket, g_strtod(score, NULL));
     // Will be ignored on update:
-    GString *datetime = g_string_new(g_date_time_format(g_date_time_new_now_utc(), "%F %T"));
+    GDateTime *now = g_date_time_new_now_utc();
+    GString *datetime = g_string_new_take(g_date_time_format(now, "%F %T"));
+    g_date_time_unref(now);
     ticket_set_created_at(ticket, datetime);
     ticket_set_created_by(ticket, 1);
 

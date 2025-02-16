@@ -9,7 +9,7 @@
 
 int is_file(const char *path);
 
-bool static_route_try(struct mg_connection *c, void *ev_data, application_context *ctx) {
+bool static_route_try(struct mg_connection *c, void *ev_data, const application_context *ctx) {
     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
     GString *filename = g_string_new(ctx->root_dir);
     filename = g_string_append_len(filename, hm->uri.buf, hm->uri.len);
@@ -19,11 +19,14 @@ bool static_route_try(struct mg_connection *c, void *ev_data, application_contex
             .mime_types = "htm=text/html,html=text/html",
             .page404 = "./view/404.html"
         };
-        mg_http_serve_file(c, hm, filename->str, &opts);
-        return true;
+        char *path = g_string_free_and_steal(filename);
+        mg_http_serve_file(c, hm, path, &opts);
+        free(path);
+        return TRUE;
     } else {
+        g_string_free(filename, TRUE);
         MG_INFO(("...not found"));
-        return false;
+        return FALSE;
     }
 }
 

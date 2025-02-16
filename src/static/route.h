@@ -5,6 +5,6 @@
 #include "../../lib/mongoose.h"
 #include "../context.h"
 
-bool static_route_try(struct mg_connection *c, void *ev_data, application_context *ctx);
+bool static_route_try(struct mg_connection *c, void *ev_data, const application_context *ctx);
 
 #endif

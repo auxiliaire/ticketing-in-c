@@ -17,13 +17,14 @@ void get_index_action(struct mg_connection *c, void *ev_data, application_contex
     GError *error = NULL;
 
     g_info("Home dir: %s", g_get_home_dir());
-    filename = g_build_filename(g_get_current_dir(), "/view/main.html", NULL);
+    gchar *current_dir = g_get_current_dir();
+    filename = g_build_filename(current_dir, "/view/main.html", NULL);
+    g_free(current_dir);
 
     gboolean loaded = g_file_get_contents(filename, &content, &length, &error);
     if (!loaded) {
         handle_error(error);
-        GString *s = g_string_new("Could not load content");
-        content = g_string_free_and_steal(s);
+        content = "Could not load content";
     }
 
     LayoutModel layout_model = {
@@ -43,6 +44,7 @@ void get_index_action(struct mg_connection *c, void *ev_data, application_contex
         mg_http_serve_file(c, hm, "view/500.html", &opts);
     }
     g_string_free(render, TRUE);
+    g_free(filename);
     g_free(content);
 }
 

@@ -25,9 +25,10 @@ bool default_route_try(struct mg_connection* c, void* ev_data, application_conte
     GString *id = g_string_new("");
     method = g_string_ascii_down(method);
     ActionDelegate action_delegate = NULL;
-    bool exitcode = false;
+    bool exitcode = FALSE;
 
-    MG_INFO(("Trying URI: '%s'", g_string_free_and_steal(guri)));
+    MG_INFO(("Trying URI: '%s'", guri->str));
+    g_string_free(guri, TRUE);
 
     if (mg_match(uri, mg_str("/*/*/*"), parts4)) {
 
@@ -83,7 +84,7 @@ bool default_route_try(struct mg_connection* c, void* ev_data, application_conte
         action_delegate = get_action_delegate(method, controller, action);
     }
     if (action_delegate != NULL) {
-        exitcode = true;
+        exitcode = TRUE;
         action_delegate(c, ev_data, ctx);
     } else {
         MG_INFO(("...not found"));
@@ -92,10 +93,7 @@ bool default_route_try(struct mg_connection* c, void* ev_data, application_conte
     g_string_free(method, TRUE);
     g_string_free(controller, TRUE);
     g_string_free(action, TRUE);
-    if (id->len == 0) {
-        MG_DEBUG(("\t(freeing id of len %d)", id->len));
-        g_string_free(id, TRUE);
-    }
+    g_string_free(id, TRUE);
 
     return exitcode;
 }

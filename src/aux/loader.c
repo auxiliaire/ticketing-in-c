@@ -10,10 +10,10 @@ ActionDelegate get_action_delegate(GString *method, GString *controller, GString
 
 ActionDelegate get_action_delegate(GString *method, GString *controller, GString *action) {
 
-    GString *action_key = g_string_new("");
+    GString *action_key = g_string_new(NULL);
     g_string_append_printf(action_key, "%s:%s@%s", method->str, action->str, controller->str);
 
-    GString *action_name = g_string_new("");
+    GString *action_name = g_string_new(NULL);
     g_string_append_printf(action_name, "%s_%s_action", method->str, action->str);
 
     ActionDelegate action_delegate = NULL;
@@ -25,7 +25,7 @@ ActionDelegate get_action_delegate(GString *method, GString *controller, GString
         goto exitwithcleanup;
     }
 
-    GString *library_key = g_string_new("_unknown");
+    GString *library_key = g_string_new(NULL);
     g_string_printf(library_key, "./build/lib%s-controller.so", controller->str);
     g_debug("\t\t - library '%s'", library_key->str);
 
@@ -63,13 +63,18 @@ void *get_handle(gchar *library_key) {
         handle = dlopen(library_key, RTLD_LAZY);
         if (handle) {
             g_hash_table_insert(get_handle_table(), library_key, handle);
+        } else {
+            g_free(library_key);
         }
+    } else {
+        g_free(library_key);
     }
     return handle;
 }
 
 void handle_close(void *handle) {
-    int r = dlclose(handle);
+    // Closing the module prevents ASan from symbolizing the call:
+    int r = 0; // dlclose(handle);
     if (r != 0) {
         g_warning("Unable to close handle (code: %d).", r);
     }
@@ -100,10 +105,6 @@ void log_key(gpointer key) {
 void loader_release() {
     GHashTable *handle_table = get_handle_table();
     GHashTable *action_table = get_action_table();
-    g_hash_table_remove_all(handle_table);
     g_hash_table_destroy(handle_table);
-    g_hash_table_remove_all(action_table);
     g_hash_table_destroy(action_table);
 }
-
-

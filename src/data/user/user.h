@@ -14,7 +14,7 @@ typedef enum user_field {
 } UserField;
 
 typedef struct user {
-  int64_t id;
+  int id;
   GString *public_id;
   GString *username;
   GString *password;
@@ -25,7 +25,7 @@ typedef struct user {
 void *user_new();
 void user_delete(User *user);
 
-int64_t user_get_id(User *user);
+int user_get_id(User *user);
 GString *user_get_public_id(User *user);
 GString *user_get_username(User *user);
 GString *user_get_password(User *user);
@@ -33,7 +33,7 @@ GString *user_get_token(User *user);
 GString *user_get_token_expiry(User *user);
 
 void user_set_value(void *object, size_t index, void *value);
-void user_set_id(User *user, int64_t id);
+void user_set_id(User *user, int id);
 void user_set_public_id(User *user, GString *public_id);
 void user_set_username(User *user, GString *username);
 void user_set_password(User *user, GString *password);

@@ -91,6 +91,7 @@ GString *fetch_as_json(sqlite3_stmt *ppStmt) {
                 g_string_replace(text, "\n", "\\n", 0);
                 g_string_append_printf(json, "\"%s\":\"%s\"", colAlias, text->str);
             }
+            g_strfreev(tokens);
         }
         g_string_append_c(json, '}');
         rc = sqlite3_step(ppStmt);

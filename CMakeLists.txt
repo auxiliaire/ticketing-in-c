@@ -100,6 +100,11 @@ target_include_directories(tickets-controller PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/ticket
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/user
 )
+target_compile_options(
+    tickets-controller PUBLIC
+    -W -Wall -Wextra -Wpedantic
+    -fsanitize=address -fno-omit-frame-pointer -O3
+)
 target_link_libraries(
     tickets-controller
     ${SQLite3_LIBRARIES}
@@ -117,6 +122,11 @@ target_include_directories(default-controller PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/ticket
     ${CMAKE_CURRENT_SOURCE_DIR}/src/data/user
+)
+target_compile_options(
+    default-controller PUBLIC
+    -W -Wall -Wextra -Wpedantic
+    -fsanitize=address -fno-omit-frame-pointer -O3
 )
 target_link_libraries(
     default-controller
