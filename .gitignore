@@ -62,3 +62,9 @@ ticketing
 
 # Redistributables
 public/dist/
+
+# Secrets
+*.pem
+
+# Testing
+urls.txt
